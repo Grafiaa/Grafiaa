@@ -1,0 +1,1410 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Grafiaa</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fragment+Mono&family=Host+Grotesk:wght@400;500;600&family=Source+Sans+3:wght@200..900&display=swap" rel="stylesheet">
+<style>
+:root{
+  --sheet:#F5F4F6; --warm:#FAF6F5; --cool:#EEF3EF; --panel:#FBFAFB; --white:#FFFFFF;
+  --ink:#16181A; --ink-2:#5E5F66; --hair:#C9C7C4; --soft:#E3E1E0;
+  --lav:#DCDDF3; --lav-d:#4A4EB0; --danger:#A8261E;
+  --ui:'Host Grotesk',ui-sans-serif,system-ui,sans-serif;
+  --mono:'Fragment Mono',ui-monospace,Menlo,monospace;
+  --glyph:'Source Sans 3',sans-serif;
+  --ease:cubic-bezier(.19,1,.22,1);
+  --dots:radial-gradient(circle at 1px 1px,#B9B7B4 1px,transparent 1.3px) 0 0/8px 8px;
+  color-scheme:light;
+}
+*{box-sizing:border-box}
+html,body{margin:0}
+body{background:var(--sheet);background-image:radial-gradient(1100px 760px at 0% 0%,var(--warm),transparent 62%),radial-gradient(1000px 700px at 100% 100%,var(--cool),transparent 62%);background-attachment:fixed;color:var(--ink);font:400 14px/1.5 var(--ui);-webkit-font-smoothing:antialiased;text-rendering:optimizeLegibility}
+::selection{background:var(--lav);color:var(--ink)}
+:focus-visible{outline:2px solid var(--lav-d);outline-offset:2px}
+*{scrollbar-width:thin;scrollbar-color:var(--hair) transparent}
+input,textarea{caret-color:var(--lav-d)}
+a{color:inherit}
+h1,h2,h3,p,ul,ol,dl,dd,figure{margin:0;padding:0}
+ul,ol{list-style:none}
+button{font:inherit;color:inherit}
+.mono{font-family:var(--mono);font-variant-numeric:tabular-nums}
+.i{width:18px;height:18px;fill:none;stroke:currentColor;stroke-width:1.6;stroke-linecap:round;stroke-linejoin:round;flex:none}
+.sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
+.dots{background:var(--dots)}
+[hidden]{display:none!important}
+
+/* marcas de registro */
+.tick{position:absolute;width:9px;height:9px;pointer-events:none;color:var(--ink);z-index:1}
+.tick::before{content:"";position:absolute;inset:0;background:linear-gradient(currentColor,currentColor) 50% 50%/100% 1px no-repeat,linear-gradient(currentColor,currentColor) 50% 50%/1px 100% no-repeat}
+.tick.tl{left:-4px;top:-4px}.tick.tr{right:-4px;top:-4px}.tick.bl{left:-4px;bottom:-4px}.tick.br{right:-4px;bottom:-4px}
+.reg .tick{width:15px;height:15px}
+.reg .tick.tl{left:-7px;top:-7px}.reg .tick.tr{right:-7px;top:-7px}.reg .tick.bl{left:-7px;bottom:-7px}.reg .tick.br{right:-7px;bottom:-7px}
+.reg .tick::after{content:"";position:absolute;inset:4px;border:1px solid currentColor;border-radius:50%}
+
+/* botões e campos */
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;height:36px;padding:0 16px;border:0;border-radius:0;font:500 13px/1 var(--ui);text-decoration:none;cursor:pointer;white-space:nowrap;transition:background-color .1s ease,color .1s ease,box-shadow .1s ease}
+.btn .i{width:16px;height:16px}
+.btn-primary{background:var(--ink);color:#fff}
+.btn-primary:hover{background:#2E3035}
+.btn-primary:active{background:var(--sheet);color:var(--ink);box-shadow:inset 0 0 0 1px var(--ink)}
+.btn-ghost{background:transparent;color:var(--ink);box-shadow:inset 0 0 0 1px var(--ink)}
+.btn-ghost:hover{background:var(--ink);color:#fff}
+.btn-ghost:active{background:var(--sheet);color:var(--ink)}
+.btn-sm{height:30px;padding:0 12px;font-size:12.5px}
+.btn-lg{height:46px;padding:0 22px;font-size:14px}
+.btn-block{width:100%}
+.btn-quiet{background:none;border:0;padding:2px 0;color:var(--ink-2);font:inherit;text-decoration:underline;text-underline-offset:3px;text-decoration-color:var(--hair);cursor:pointer}
+.btn-quiet:hover{color:var(--ink);text-decoration-color:var(--ink)}
+.icon-btn{width:34px;height:34px;display:inline-grid;place-items:center;border:0;background:none;color:var(--ink-2);cursor:pointer}
+.icon-btn:hover{background:var(--lav);color:var(--ink)}
+.field{display:grid;gap:7px}
+.field > label,.field .label{font:500 13px var(--ui)}
+.input{width:100%;height:42px;padding:0 12px;border:1px solid var(--hair);border-radius:0;background:var(--white);color:var(--ink);font:400 14.5px var(--ui);transition:border-color .1s ease,box-shadow .1s ease}
+.input::placeholder{color:var(--ink-2);opacity:1}
+.input:hover{border-color:#A3A19E}
+.input:focus{outline:none;border-color:var(--ink);box-shadow:0 0 0 3px var(--lav)}
+.hint{font-size:12.5px;color:var(--ink-2)}
+.err-msg{display:none;align-items:center;gap:6px;font-size:12.5px;color:var(--danger)}
+.err-msg .i{width:15px;height:15px}
+.field.err .input{border-color:var(--danger)}
+.field.err .err-msg{display:flex}
+.check{display:flex;align-items:center;gap:10px;cursor:pointer;font-size:13.5px}
+.check input{appearance:none;width:16px;height:16px;margin:0;border:1px solid var(--ink);background:var(--white);display:grid;place-items:center;flex:none;cursor:pointer}
+.check input:checked{background:var(--ink)}
+.check input:checked::after{content:"";width:8px;height:5px;border:solid #fff;border-width:0 0 1.5px 1.5px;transform:translate(0,-1px) rotate(-45deg)}
+.check input:disabled{border-color:var(--hair);cursor:not-allowed}
+.check:has(input:disabled){color:var(--ink-2);cursor:not-allowed}
+
+/* barra do app */
+.appbar{position:sticky;top:0;z-index:20;display:flex;align-items:center;gap:20px;height:56px;padding:0 24px;background:var(--panel);border-bottom:1px solid var(--hair);white-space:nowrap}
+.brand{display:inline-flex;align-items:center;gap:9px;font:600 17px/1 var(--ui);letter-spacing:-.02em;color:var(--ink);text-decoration:none}
+.brand svg{width:18px;height:18px;fill:none;stroke:currentColor;stroke-width:1.2}
+.crumbs{display:flex;align-items:center;gap:8px;min-width:0;font-size:13.5px;color:var(--ink-2)}
+.crumbs a{text-decoration:none}
+.crumbs a:hover{color:var(--ink);text-decoration:underline;text-underline-offset:3px}
+.crumbs b{color:var(--ink);font-weight:500;overflow:hidden;text-overflow:ellipsis}
+.sp{flex:1}
+.who{font-size:13px;color:var(--ink-2)}
+.demo-tag{display:inline-flex;align-items:center;height:24px;padding:0 9px;box-shadow:inset 0 0 0 1px var(--hair);font-size:12px;color:var(--ink-2);white-space:nowrap}
+@media (max-width:640px){.appbar{padding:0 16px;gap:12px}.who{display:none}.crumbs{display:none}}
+
+.screen{min-height:100vh;min-height:100dvh;animation:enter .6s var(--ease)}
+@keyframes enter{from{opacity:.35;transform:translateY(6px)}}
+
+/* ---------- T1 Entrar ---------- */
+.auth{display:grid;grid-template-columns:minmax(0,1fr) 480px;min-height:100vh;min-height:100dvh}
+.auth-plate{position:relative;padding:40px 56px 48px;display:flex;flex-direction:column;gap:28px;overflow:hidden}
+.auth-plate h1{font:400 clamp(44px,5.4vw,84px)/.98 var(--ui);letter-spacing:-.035em;max-width:11ch;text-wrap:balance}
+.auth-plate .lede{font-size:18px;line-height:1.5;color:#33353A;max-width:44ch}
+.auth-fig{position:relative;flex:1;min-height:300px;margin-top:4px;background:rgba(251,250,251,.6);box-shadow:0 0 0 1px var(--hair)}
+.auth-fig svg{position:absolute;inset:0;width:100%;height:100%}
+.auth-fig .void{position:absolute;right:0;top:0;width:28%;height:38%;background:var(--dots);opacity:.8}
+.auth-cap{display:flex;justify-content:space-between;gap:16px;font-size:12.5px;color:var(--ink-2)}
+.auth-side{display:flex;flex-direction:column;justify-content:center;padding:48px 56px;background:var(--panel);border-left:1px solid var(--hair)}
+.tabs{display:flex;gap:28px;border-bottom:1px solid var(--hair);margin-bottom:28px}
+.tab{position:relative;height:44px;padding:0;border:0;background:none;font:500 15px var(--ui);color:var(--ink-2);cursor:pointer}
+.tab[aria-selected="true"]{color:var(--ink)}
+.tab[aria-selected="true"]::after{content:"";position:absolute;left:0;right:0;bottom:-1px;height:2px;background:var(--ink)}
+.tab:hover{color:var(--ink)}
+.auth-form{display:grid;gap:20px}
+.form-err{display:none;align-items:center;gap:10px;padding:12px 14px;background:#F8E9E7;color:var(--danger);font-size:13.5px;box-shadow:inset 0 0 0 1px #E9C4BF}
+.form-err.on{display:flex}
+.auth-note{margin-top:28px;font-size:12.5px;color:var(--ink-2)}
+@media (max-width:980px){
+  .auth{grid-template-columns:1fr;align-content:start}
+  .auth-plate{padding:28px 16px 8px}
+  .auth-fig,.auth-cap{display:none}
+  .auth-side{border-left:0;padding:24px 16px 48px;background:transparent;justify-content:flex-start}
+}
+
+/* ---------- páginas com conteúdo ---------- */
+.page{max-width:1280px;margin:0 auto;padding:40px 40px 96px}
+.page-head{display:flex;align-items:flex-end;justify-content:space-between;gap:16px;margin-bottom:36px}
+.page-head h1{font:400 48px/1 var(--ui);letter-spacing:-.035em}
+.page-head .meta{margin-top:10px;font-size:13px;color:var(--ink-2)}
+.page-head .meta .mono{font-size:12.5px;color:var(--ink)}
+@media (max-width:640px){.page{padding:28px 16px 96px}.page-head h1{font-size:32px}}
+
+/* ---------- T2 Minhas fontes ---------- */
+.cards{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:36px 32px}
+.card{position:relative;transition:transform .6s var(--ease)}
+.card:hover{transform:translateY(-4px)}
+.card:hover .tick{color:var(--lav-d)}
+.card-art{position:relative;display:block;background:var(--panel);box-shadow:0 0 0 1px var(--hair);text-decoration:none}
+.card-art svg{display:block;width:100%;height:auto}
+.card-meta{display:grid;grid-template-columns:1fr auto;gap:3px 8px;padding:14px 2px 0}
+.card-name{font:500 16px/1.3 var(--ui)}
+.card-name a{text-decoration:none}
+.card-name a:hover{text-decoration:underline;text-underline-offset:3px}
+.card-meta p{grid-column:1;font-size:12.5px;color:var(--ink-2)}
+.card-meta p .mono{font-size:12px}
+.card-menu{grid-column:2;grid-row:1 / span 2;align-self:start}
+.st{font-family:var(--glyph);font-size:112px;fill:var(--ink)}
+.st.ghost{fill:none;stroke:var(--ink-2);stroke-width:1.2;stroke-dasharray:4 5}
+.fx{fill:none;stroke:var(--ink);stroke-width:9;stroke-linecap:round;stroke-linejoin:round}
+.fx circle{fill:var(--ink);stroke:none}
+.menu{position:absolute;z-index:40;min-width:180px;padding:6px 0;background:var(--panel);box-shadow:0 0 0 1px var(--hair),0 14px 30px -16px rgba(22,24,26,.45)}
+.menu button{display:flex;align-items:center;gap:10px;width:100%;height:36px;padding:0 14px;border:0;background:none;text-align:left;font-size:13.5px;cursor:pointer}
+.menu button:hover,.menu button:focus-visible{background:var(--lav);outline:none}
+.menu button.danger{color:var(--danger)}
+.menu hr{border:0;border-top:1px solid var(--soft);margin:6px 0}
+.menu .menu-h{padding:6px 14px 2px;font-size:12px;color:var(--ink-2)}
+.empty{position:relative;display:grid;justify-items:start;gap:14px;padding:56px;background:var(--panel);box-shadow:0 0 0 1px var(--hair);overflow:hidden}
+.empty .void{position:absolute;right:0;top:0;bottom:0;width:38%;background:var(--dots);opacity:.75}
+.empty h2{font:400 30px/1.1 var(--ui);letter-spacing:-.02em;max-width:18ch;position:relative}
+.empty p{max-width:52ch;font-size:15.5px;color:#33353A;position:relative}
+.empty .btn{position:relative;margin-top:10px}
+.demo-toggle{margin-top:56px;font-size:13px;color:var(--ink-2)}
+@media (max-width:640px){.empty{padding:32px 20px}.empty .void{display:none}.card-art svg{height:128px}.cards{gap:28px}}
+
+/* ---------- janelas ---------- */
+.dlg{width:min(760px,calc(100vw - 32px));max-height:calc(100dvh - 32px);padding:0;border:0;background:var(--panel);color:var(--ink);box-shadow:0 0 0 1px var(--hair),0 40px 80px -40px rgba(22,24,26,.55)}
+.dlg[open]{animation:dlg .6s var(--ease)}
+@keyframes dlg{from{opacity:.4;transform:translateY(10px)}}
+.dlg::backdrop{background:rgba(22,24,26,.3)}
+.dlg-sm{width:min(440px,calc(100vw - 32px))}
+.dlg form{display:flex;flex-direction:column;max-height:inherit}
+.dlg-head{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:20px 20px 0 28px}
+.dlg-head h2{font:400 26px/1.1 var(--ui);letter-spacing:-.02em}
+.dlg-body{padding:22px 28px 8px;overflow:auto;display:grid;gap:24px}
+.dlg-body > p{color:#33353A;font-size:15px}
+.dlg-foot{display:flex;justify-content:flex-end;gap:10px;padding:20px 28px 24px;border-top:1px solid var(--soft);margin-top:16px}
+.input-wrap{position:relative}
+.input-wrap .count{position:absolute;right:12px;top:50%;transform:translateY(-50%);font-size:12px;color:var(--ink-2)}
+.input-wrap .input{padding-right:60px}
+.starts{border:0;margin:0;padding:0;display:grid;grid-template-columns:1fr 1fr;gap:16px}
+.starts legend{font:500 13px var(--ui);margin-bottom:10px;padding:0}
+.start{position:relative;display:flex;flex-direction:column;background:var(--white);box-shadow:0 0 0 1px var(--hair);transition:box-shadow .1s ease,background-color .1s ease}
+.start:hover{box-shadow:0 0 0 1px #A3A19E}
+.start.on{background:#F2F2FA;box-shadow:0 0 0 1.5px var(--ink)}
+.start-main{display:grid;grid-template-columns:1fr auto;gap:4px 12px;padding:16px 16px 12px;cursor:pointer}
+.start-main input{grid-column:2;grid-row:1;appearance:none;width:18px;height:18px;margin:2px 0 0;border:1px solid var(--ink);border-radius:50%;background:var(--white);cursor:pointer}
+.start-main input:checked{background:radial-gradient(circle,var(--ink) 4px,var(--white) 4.5px)}
+.start-art{grid-column:1 / -1;display:flex;align-items:center;height:56px;margin-bottom:6px}
+.start-main b{grid-column:1;grid-row:1;font:500 15px var(--ui)}
+.start-main .desc{grid-column:1 / -1;font-size:13px;color:var(--ink-2)}
+.start-opts{display:grid;gap:8px;padding:12px 16px 16px;border-top:1px solid var(--soft)}
+.start:not(.on) .start-opts{opacity:.72}
+.art-scripts{font:400 40px/1 var(--glyph);letter-spacing:.02em;display:flex;gap:18px}
+.art-keys{display:grid;grid-template-columns:repeat(13,14px);grid-auto-rows:14px;gap:3px}
+.art-keys i{background:var(--dots);box-shadow:inset 0 0 0 1px var(--hair)}
+.art-keys i.on{background:var(--ink);box-shadow:none}
+.art-blank{width:46px;height:52px;background:var(--dots);box-shadow:0 0 0 1px var(--hair)}
+.art-file{display:flex;align-items:center;gap:10px;font-size:12px;color:var(--ink-2)}
+.art-file .i{width:30px;height:30px;stroke-width:1.2;color:var(--ink)}
+.file-row{display:flex;align-items:center;gap:10px;min-width:0}
+.file-row .fname{font-size:12.5px;color:var(--ink-2);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+@media (max-width:640px){
+  .dlg{width:100vw;max-width:100vw;height:100dvh;max-height:100dvh;margin:0}
+  .starts{grid-template-columns:1fr}
+  .dlg-head,.dlg-body,.dlg-foot{padding-left:16px;padding-right:16px}
+}
+
+/* ---------- T4 Visão da fonte ---------- */
+.fv{display:grid;grid-template-columns:268px minmax(0,1fr);min-height:calc(100vh - 56px)}
+.fv-side{position:sticky;top:56px;align-self:start;height:calc(100vh - 56px);overflow:auto;display:flex;flex-direction:column;gap:12px;padding:28px 20px 24px;background:var(--panel);border-right:1px solid var(--hair)}
+.side-h{font:500 12.5px var(--ui);color:var(--ink);padding:0 4px}
+.filters{display:grid;margin-bottom:20px}
+.filters button{display:flex;justify-content:space-between;align-items:center;width:100%;height:36px;padding:0 10px;border:0;background:none;box-shadow:0 1px 0 var(--soft);font-size:13.5px;text-align:left;cursor:pointer}
+.filters button:hover{background:rgba(220,221,243,.55)}
+.filters button[aria-pressed="true"]{background:var(--lav);font-weight:500}
+.filters .mono{font-size:12px;color:var(--ink-2)}
+.filters button[aria-pressed="true"] .mono{color:var(--ink)}
+.credits{display:grid}
+.credits .row{display:grid;grid-template-columns:1fr 92px;align-items:center;gap:8px;min-height:34px;padding:0 4px;box-shadow:0 1px 0 var(--soft);font-size:13px}
+.credits .row > span{color:var(--ink-2)}
+.credits input{width:100%;height:26px;border:0;border-bottom:1px solid transparent;background:transparent;text-align:right;font:400 12.5px var(--mono);color:var(--ink);padding:0}
+.credits input:hover{border-bottom-color:var(--hair)}
+.credits input:focus{outline:none;border-bottom-color:var(--ink);background:var(--white)}
+.credits .ro{text-align:right;font:400 12.5px var(--mono)}
+.side-foot{margin-top:auto;padding-top:20px}
+.stamp{display:block;width:124px;height:124px}
+.stamp .spin{transform-origin:60px 60px;animation:spin 26s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+.pending{position:relative;display:grid;gap:10px;padding:16px;background:var(--white);box-shadow:0 0 0 1px var(--hair)}
+.pending b{display:flex;align-items:center;gap:8px;font:500 13.5px var(--ui)}
+.pending p{font-size:12.5px;color:var(--ink-2)}
+.fv-main{padding:32px 40px 96px;min-width:0}
+.fv-head{display:flex;align-items:flex-end;justify-content:space-between;gap:20px;flex-wrap:wrap;margin-bottom:10px}
+.fv-head h1{font:400 48px/1 var(--ui);letter-spacing:-.035em}
+.fv-head .meta{margin-top:10px;font-size:13px;color:var(--ink-2)}
+.fv-head .meta .mono{font-size:12.5px;color:var(--ink)}
+.fv-actions{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+.search{display:flex;align-items:center;gap:8px;width:280px;height:36px;padding:0 10px;background:var(--white);box-shadow:inset 0 0 0 1px var(--hair);color:var(--ink-2)}
+.search:focus-within{box-shadow:inset 0 0 0 1px var(--ink),0 0 0 3px var(--lav)}
+.search input{flex:1;min-width:0;height:100%;border:0;background:none;font:400 13.5px var(--ui);color:var(--ink);outline:none}
+.search input::placeholder{color:var(--ink-2);opacity:1}
+.fv-status{display:flex;align-items:center;gap:12px;min-height:44px;margin-bottom:12px;font-size:13px;color:var(--ink-2);border-bottom:1px solid var(--soft)}
+.fv-status b{color:var(--ink);font-weight:500}
+.fv-status{flex-wrap:wrap;gap:4px 12px;padding:8px 0}
+.fv-status > span:first-child{white-space:nowrap}
+.grp{margin-top:34px}
+.grp:first-child{margin-top:18px}
+.grp-h{display:flex;align-items:baseline;gap:10px;margin-bottom:16px}
+.grp-h h2{font:500 15px var(--ui)}
+.grp-h span{font-size:12px;color:var(--ink-2)}
+.ggrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(108px,1fr));margin:0 4px}
+.cell{position:relative;display:flex;flex-direction:column;padding:0;border:0;background:transparent;text-align:left;cursor:default;transition:background-color .1s ease}
+.cell:hover{background:rgba(220,221,243,.45)}
+.cell[aria-selected="true"]{background:var(--lav)}
+.cell:focus-visible{outline-offset:-2px;z-index:2}
+.cell svg{display:block;width:100%;height:auto}
+.cell .gl{font-family:var(--glyph);font-size:54px;fill:var(--ink)}
+.cell .spc{fill:none;stroke:var(--ink-2);stroke-width:1.2}
+.cell .gp{fill:var(--ink)}
+.cell svg{overflow:visible}
+.cell .void{display:grid;place-items:center;aspect-ratio:100/68;margin:10px 12px 0;background:var(--dots);font:400 13px var(--mono);color:var(--ink-2)}
+.cell .void span{background:var(--sheet);padding:0 6px}
+.cell[aria-selected="true"] .void span{background:var(--lav)}
+.cell .cm{display:flex;justify-content:space-between;align-items:baseline;gap:6px;padding:4px 10px 28px;font-size:12px}
+.cell .cn{font-weight:500;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.cell .cc{font:400 11px var(--mono);color:var(--ink-2);flex:none}
+.cell .tick{width:9px;height:9px}
+.no-res{position:relative;padding:40px;margin-top:20px;background:var(--panel);box-shadow:0 0 0 1px var(--hair)}
+.no-res p{font-size:15px}
+@media (max-width:900px){
+  .fv{grid-template-columns:1fr}
+  .fv-side{position:static;height:auto;border-right:0;border-bottom:1px solid var(--hair);padding:16px}
+  .filters{display:flex;overflow-x:auto;gap:6px;margin-bottom:0;scrollbar-width:none;-webkit-mask-image:linear-gradient(90deg,#000 82%,transparent);mask-image:linear-gradient(90deg,#000 82%,transparent);padding-right:40px}
+  .filters::-webkit-scrollbar{display:none}
+  .filters button{width:auto;flex:none;gap:10px;box-shadow:inset 0 0 0 1px var(--soft)}
+  .fv-side .side-h,.fv-side .credits,.fv-side .side-foot,.fv-side .info-h{display:none}
+  .fv-main{padding:24px 16px 96px}
+  .fv-status > span:not(:first-child){display:none}
+  .fv-head h1{font-size:32px}
+  .search{width:100%}
+  .fv-actions{width:100%}
+}
+
+/* ---------- T5 Editor de glifo ---------- */
+.ed{display:grid;grid-template-columns:minmax(0,1fr) 320px;grid-template-rows:48px minmax(0,1fr) 116px;grid-template-areas:"top top" "canvas insp" "prev insp";height:100vh;height:100dvh;animation:none}
+.ed-top{grid-area:top;display:flex;align-items:center;gap:14px;padding:0 16px 0 20px;background:var(--panel);border-bottom:1px solid var(--hair);white-space:nowrap;min-width:0}
+.ed-back{display:inline-flex;align-items:center;gap:6px;font-size:13px;color:var(--ink-2);text-decoration:none}
+.ed-back b{color:var(--ink);font-weight:500}
+.ed-back:hover{color:var(--ink)}
+.gnav{display:flex;align-items:center;gap:2px}
+.gcur{display:flex;align-items:baseline;gap:7px;padding:0 6px}
+.gcur b{font:600 20px/1 var(--glyph)}
+.gcur small{font:400 12px var(--mono);color:var(--ink-2)}
+.save{display:inline-flex;align-items:center;gap:7px;font:400 13px var(--ui);color:var(--ink-2)}
+.save .mono{font-size:12px}
+.save::before{content:"";width:7px;height:7px;border-radius:50%;background:#3E8F55}
+.save.busy::before{background:var(--lav-d);animation:pulse 1s ease-in-out infinite}
+@keyframes pulse{50%{opacity:.3}}
+.ed-canvas{grid-area:canvas;position:relative;overflow:hidden;background:var(--sheet);touch-action:none;user-select:none;-webkit-user-select:none}
+.ed-canvas > .gsvg{position:absolute;inset:0;width:100%;height:100%;display:block}
+.ed-canvas[data-tool="pen"],.ed-canvas[data-tool="rect"],.ed-canvas[data-tool="ellipse"]{cursor:crosshair}
+.ed-canvas[data-tool="hand"]{cursor:grab}
+.ed-canvas.panning{cursor:grabbing}
+.ed-tools{position:absolute;top:20px;left:20px;z-index:3;display:flex;flex-direction:column;background:var(--panel);box-shadow:0 0 0 1px var(--hair),0 10px 22px -14px rgba(22,24,26,.45)}
+.ed-tool{position:relative;width:44px;height:44px;display:grid;place-items:center;border:0;background:none;color:var(--ink);cursor:pointer;transition:background-color .1s ease,color .1s ease}
+.ed-tool + .ed-tool{box-shadow:0 -1px 0 var(--soft)}
+.ed-tool:hover{background:var(--lav)}
+.ed-tool[aria-pressed="true"]{background:var(--ink);color:#fff}
+.ed-tool kbd{position:absolute;right:3px;bottom:2px;font:400 8.5px var(--mono);opacity:.65}
+.ed-hint{grid-column:1 / -1;margin:0;padding:0 0 10px;font-size:12.5px;color:var(--ink-2);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.ed-zoom{position:absolute;right:16px;bottom:16px;z-index:3;display:flex;align-items:center;background:var(--panel);box-shadow:0 0 0 1px var(--hair)}
+.ed-zoom button{width:32px;height:32px;border:0;background:none;cursor:pointer;display:grid;place-items:center}
+.ed-zoom button:hover{background:var(--lav)}
+.ed-zoom .mono{min-width:52px;text-align:center;font-size:12px}
+.ed-empty{position:absolute;left:50%;top:50%;z-index:2;width:min(420px,calc(100% - 140px));transform:translate(-50%,-50%);padding:22px 24px;background:var(--panel);box-shadow:0 0 0 1px var(--hair),0 20px 40px -26px rgba(22,24,26,.5)}
+.ed-empty h2{font:500 16px var(--ui);margin-bottom:6px}
+.ed-empty p{font-size:13.5px;color:#33353A}
+.gsvg .ml{stroke:var(--hair);stroke-width:1;vector-effect:non-scaling-stroke}
+.gsvg .ml.base{stroke:#A3A19E}
+.gsvg .lab{fill:var(--ink-2);font-family:var(--ui);font-weight:500}
+.gsvg .val{fill:var(--ink-2);font-family:var(--mono)}
+.gsvg .sb{stroke:var(--hair);stroke-width:1;vector-effect:non-scaling-stroke}
+.gsvg .rg{fill:none;stroke:var(--ink);stroke-width:1;vector-effect:non-scaling-stroke}
+.gsvg .gp{fill:var(--ink)}
+.gsvg .op{fill:none;stroke:var(--ink);stroke-width:1.5;vector-effect:non-scaling-stroke}
+.gsvg .draft{fill:rgba(74,78,176,.12);stroke:var(--lav-d);stroke-width:1;stroke-dasharray:4 4;vector-effect:non-scaling-stroke}
+.gsvg .hl{stroke:var(--lav-d);stroke-width:1;vector-effect:non-scaling-stroke}
+.gsvg .hd{fill:var(--lav-d);cursor:pointer}
+.gsvg .hd.sel{fill:#fff;stroke:var(--lav-d);stroke-width:2;vector-effect:non-scaling-stroke}
+.gsvg .nd{fill:#fff;stroke:var(--lav-d);stroke-width:1.6;vector-effect:non-scaling-stroke;cursor:pointer}
+.gsvg .nd.first{stroke-width:2.4}
+.gsvg .nd.sel{fill:var(--lav-d);stroke:#fff;stroke-width:2}
+.gsvg .tip rect{fill:var(--ink)}
+.gsvg .tip text{fill:#fff;font-family:var(--mono)}
+.ed-insp{grid-area:insp;overflow:auto;background:var(--panel);border-left:1px solid var(--hair);padding-bottom:24px}
+.ins-sec{padding:18px 24px 14px;border-bottom:1px solid var(--hair)}
+.ins-sec h2{font:500 12.5px var(--ui);margin-bottom:4px}
+.fld{display:grid;grid-template-columns:1fr 96px;align-items:center;gap:10px;min-height:36px;box-shadow:0 1px 0 var(--soft)}
+.fld:last-child{box-shadow:none}
+.fld > span,.fld > label{font-size:13px;color:var(--ink-2)}
+.fld input{width:100%;height:26px;padding:0;border:0;border-bottom:1px solid transparent;background:transparent;text-align:right;font:400 12.5px var(--mono);color:var(--ink)}
+.fld input:hover:not(:disabled){border-bottom-color:var(--hair)}
+.fld input:focus{outline:none;border-bottom-color:var(--ink);background:var(--white)}
+.fld input:disabled{color:var(--ink-2)}
+.fld .ro{text-align:right;font:400 12.5px var(--mono)}
+.seg{display:grid;grid-template-columns:1fr 1fr;margin-top:10px;box-shadow:inset 0 0 0 1px var(--ink)}
+.seg button{height:30px;border:0;background:none;font-size:12.5px;cursor:pointer}
+.seg button[aria-pressed="true"]{background:var(--ink);color:#fff}
+.seg button:disabled{color:var(--ink-2);cursor:not-allowed}
+.seg:has(button:disabled){box-shadow:inset 0 0 0 1px var(--hair)}
+.ins-note{font-size:12.5px;color:var(--ink-2);padding:4px 0 6px}
+.ins-note.warn{color:var(--danger)}
+.keys-list{display:grid;gap:6px;padding:6px 0 8px;font-size:12.5px;color:var(--ink-2)}
+.keys-list div{display:flex;justify-content:space-between;gap:10px}
+.keys-list kbd{font:400 11px var(--mono);color:var(--ink);white-space:nowrap}
+.ed-prev{grid-area:prev;display:grid;grid-template-columns:auto minmax(0,1fr) auto;align-items:center;column-gap:20px;padding:4px 24px 0;min-width:0;background:var(--panel);border-top:1px solid var(--hair)}
+.pv-label{flex:none;font-size:12.5px;font-weight:500;color:var(--ink-2)}
+.pv-render{min-width:0;height:72px;display:flex;align-items:center;padding:0 10px;border:0;background:none;text-align:left;font:400 48px/1 var(--glyph);color:var(--ink);white-space:pre;overflow:hidden;cursor:text}
+.pv-render:hover{box-shadow:inset 0 0 0 1px var(--soft)}
+.pv-input{min-width:0;height:72px;padding:0 10px;border:0;background:var(--white);box-shadow:inset 0 0 0 1px var(--ink);font:400 48px/1 var(--glyph);color:var(--ink);outline:none}
+.pv-size{flex:none;font-size:12px;color:var(--ink-2)}
+.cur{background:var(--lav)}
+.gi{display:inline-block;height:1em;vertical-align:-.2em;overflow:visible}
+.gi path{fill:currentColor}
+.gi .fx path{fill:none}
+.gi .fx{stroke:currentColor}
+.gi .fx circle{fill:currentColor}
+.tofu{display:inline-block;width:.5em;height:.66em;margin:0 .05em;vertical-align:-.02em;box-shadow:inset 0 0 0 1px var(--hair);background:var(--dots)}
+@media (max-width:900px){
+  .ed{grid-template-columns:minmax(0,1fr);grid-template-rows:48px 62vh auto auto;grid-template-areas:"top" "canvas" "prev" "insp";height:auto}
+  .ed-top{overflow:hidden;gap:8px;padding:0 10px 0 14px}
+  .ed-top .brand span,.ed-back span,.ed-top .ed-test{display:none}
+  .ed-hint{white-space:normal}
+  .ed-prev{padding-top:8px}
+  .ed-insp{border-left:0}
+}
+
+/* ---------- T6 Testar fonte ---------- */
+.tt{display:grid;grid-template-columns:minmax(0,1fr) 300px;gap:64px;align-items:start}
+.tt-controls{display:flex;align-items:center;justify-content:space-between;gap:16px 24px;flex-wrap:wrap;margin-bottom:22px}
+.presets{display:flex;box-shadow:inset 0 0 0 1px var(--ink)}
+.presets button{height:34px;padding:0 14px;border:0;background:none;font-size:13px;cursor:pointer}
+.presets button + button{box-shadow:-1px 0 0 var(--ink)}
+.presets button:hover{background:var(--lav)}
+.presets button[aria-pressed="true"]{background:var(--ink);color:#fff}
+.size{display:flex;align-items:center;gap:12px;font-size:13px;color:var(--ink-2)}
+.size output{min-width:56px;font-size:12px;color:var(--ink)}
+input[type=range]{appearance:none;width:200px;height:20px;background:transparent;margin:0;cursor:pointer}
+input[type=range]::-webkit-slider-runnable-track{height:1px;background:var(--ink)}
+input[type=range]::-moz-range-track{height:1px;background:var(--ink)}
+input[type=range]::-webkit-slider-thumb{appearance:none;width:12px;height:12px;margin-top:-6px;background:var(--ink);border:0}
+input[type=range]::-moz-range-thumb{width:12px;height:12px;background:var(--ink);border:0;border-radius:0}
+input[type=range]:focus-visible::-webkit-slider-thumb{box-shadow:0 0 0 3px var(--lav)}
+.tt-plate{position:relative;background:var(--white);box-shadow:0 0 0 1px var(--hair)}
+.tt-box{position:relative;height:min(calc(100vh - 392px),480px);min-height:260px}
+.tt-ta,.tt-render{position:absolute;inset:0;margin:0;padding:28px 32px;border:0;font-size:72px;line-height:1.2;white-space:pre-wrap;overflow-wrap:break-word;word-break:normal;overflow:auto;letter-spacing:0;tab-size:4}
+.tt-ta{width:100%;height:100%;resize:none;background:transparent;color:var(--ink);font-family:var(--glyph);outline:none}
+.tt-ta:focus-visible{box-shadow:inset 0 0 0 2px var(--lav-d)}
+.tt-render{pointer-events:none;color:var(--ink);overflow:hidden}
+.tt-box.fict .tt-ta,.tt-box.fict .tt-render{font-family:var(--mono)}
+.tt-box.fict .tt-ta{color:transparent}
+.tt-render .eg{display:inline-block;width:var(--adv,.6em);height:1em;vertical-align:-.22em}
+.tt-render .eg svg{display:block;width:100%;height:100%;overflow:visible}
+.tt-render .tf{display:inline-block;width:calc(var(--adv,.6em) - .1em);height:.66em;margin:0 .05em;vertical-align:-.04em;box-shadow:inset 0 0 0 1px var(--hair);background:var(--dots)}
+.tt-render .fb{color:var(--ink-2)}
+.tt-cap{display:flex;justify-content:space-between;gap:12px;padding:10px 2px 0;font-size:12.5px;color:var(--ink-2)}
+.tt-aside{display:grid;gap:22px}
+.tt-aside h2{font:500 12.5px var(--ui);margin-bottom:8px}
+.ready{display:flex;align-items:center;gap:16px}
+.tt-plate > .stamp{position:absolute;right:-44px;top:-56px;width:132px;height:132px;z-index:3}
+.tt.sealed .tt-controls{padding-right:104px}
+.tt.sealed .tt-ta,.tt.sealed .tt-render{padding-right:100px}
+@media (max-width:980px){.tt-plate > .stamp{right:-4px;top:-62px;width:86px;height:86px}.tt.sealed .tt-ta,.tt.sealed .tt-render{padding-right:32px}.tt.sealed .tt-controls{padding-right:0;padding-top:0}}
+.ready p{font-size:13.5px}
+.missing{display:flex;flex-wrap:wrap;gap:6px;margin-top:10px}
+.missing a{display:grid;place-items:center;width:30px;height:30px;box-shadow:inset 0 0 0 1px var(--hair);background:var(--white);font:400 12px var(--mono);text-decoration:none}
+.missing a:hover{box-shadow:inset 0 0 0 1px var(--ink);background:var(--lav)}
+@media (max-width:980px){.tt{grid-template-columns:1fr}.tt-box{height:46vh}input[type=range]{width:150px}}
+
+/* ---------- aviso e atalho do protótipo ---------- */
+.toast{position:fixed;left:50%;bottom:24px;z-index:90;max-width:calc(100vw - 32px);padding:12px 16px;background:var(--ink);color:#fff;font-size:13.5px;transform:translate(-50%,24px);opacity:0;pointer-events:none;transition:transform .6s var(--ease),opacity .3s ease}
+.toast.on{transform:translate(-50%,0);opacity:1}
+.proto{position:relative;z-index:60}
+.proto > button{display:inline-flex;align-items:center;gap:8px;height:30px;padding:0 10px;border:0;background:transparent;box-shadow:inset 0 0 0 1px var(--hair);font:500 12.5px var(--ui);color:var(--ink);cursor:pointer}
+.proto > button .i{width:16px;height:16px}
+.proto > button:hover{background:var(--lav)}
+.proto .menu{right:0;top:38px;min-width:280px}
+.proto .menu a{display:flex;justify-content:space-between;gap:12px;height:34px;align-items:center;padding:0 14px;text-decoration:none;font-size:13px}
+.proto .menu a:hover{background:var(--lav)}
+.proto .menu a .mono{font-size:12px;color:var(--ink-2)}
+
+@media (max-width:640px){.proto > button{width:30px;padding:0;justify-content:center}.proto > button span{display:none}.demo-tag{padding:0 7px;font-size:11.5px}.appbar .brand span{font-size:16px}}
+.auth-top{display:flex;align-items:center;justify-content:space-between;gap:12px}
+@media (prefers-reduced-motion:reduce){
+  *,*::before,*::after{animation-duration:.01ms!important;animation-iteration-count:1!important;transition-duration:.01ms!important}
+  .stamp .spin{animation:none}
+}
+</style>
+</head>
+<body>
+
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <defs>
+    <symbol id="i-select" viewBox="0 0 24 24"><path d="M6 3.5l12.5 7-5.6 1.7-2.6 5.8z"/></symbol>
+    <symbol id="i-pen" viewBox="0 0 24 24"><path d="M12 21l-5.5-9.5L9 4h6l2.5 7.5z"/><path d="M12 21v-7.2"/><circle cx="12" cy="11.6" r="1.4"/></symbol>
+    <symbol id="i-rect" viewBox="0 0 24 24"><rect x="4.5" y="6.5" width="15" height="11"/></symbol>
+    <symbol id="i-ellipse" viewBox="0 0 24 24"><ellipse cx="12" cy="12" rx="7.5" ry="5.5"/></symbol>
+    <symbol id="i-hand" viewBox="0 0 24 24"><path d="M8.6 12.4V6.9a1.4 1.4 0 012.8 0V11"/><path d="M11.4 11V5.3a1.4 1.4 0 012.8 0V11"/><path d="M14.2 11V6.7a1.4 1.4 0 012.8 0v6.8c0 4-2.6 6.9-6 6.9-2.3 0-3.7-1-5-3l-2.2-3.6a1.4 1.4 0 012.3-1.6l1.5 2"/></symbol>
+    <symbol id="i-chev-l" viewBox="0 0 24 24"><path d="M14.5 6l-6 6 6 6"/></symbol>
+    <symbol id="i-chev-r" viewBox="0 0 24 24"><path d="M9.5 6l6 6-6 6"/></symbol>
+    <symbol id="i-search" viewBox="0 0 24 24"><circle cx="11" cy="11" r="6"/><path d="M15.5 15.5L20 20"/></symbol>
+    <symbol id="i-plus" viewBox="0 0 24 24"><path d="M12 5.5v13M5.5 12h13"/></symbol>
+    <symbol id="i-minus" viewBox="0 0 24 24"><path d="M5.5 12h13"/></symbol>
+    <symbol id="i-download" viewBox="0 0 24 24"><path d="M12 4.5v10M7.5 10.5l4.5 4.5 4.5-4.5M5 19.5h14"/></symbol>
+    <symbol id="i-upload" viewBox="0 0 24 24"><path d="M12 15V4.5M7.5 9L12 4.5 16.5 9M5 19.5h14"/></symbol>
+    <symbol id="i-type" viewBox="0 0 24 24"><path d="M5 7.5V5h14v2.5M12 5v14M9 19h6"/></symbol>
+    <symbol id="i-dots" viewBox="0 0 24 24"><circle cx="6" cy="12" r="1"/><circle cx="12" cy="12" r="1"/><circle cx="18" cy="12" r="1"/></symbol>
+    <symbol id="i-back" viewBox="0 0 24 24"><path d="M19 12H5.5M11 6.5L5.5 12l5.5 5.5"/></symbol>
+    <symbol id="i-x" viewBox="0 0 24 24"><path d="M6.5 6.5l11 11M17.5 6.5l-11 11"/></symbol>
+    <symbol id="i-alert" viewBox="0 0 24 24"><circle cx="12" cy="12" r="8.5"/><path d="M12 7.5v5.5M12 16.3v.2"/></symbol>
+    <symbol id="i-edit" viewBox="0 0 24 24"><path d="M4.5 19.5h4l10-10-4-4-10 10z"/></symbol>
+    <symbol id="i-trash" viewBox="0 0 24 24"><path d="M5 7h14M10 7V5h4v2M7 7l1 12.5h8L17 7"/></symbol>
+    <symbol id="i-grid" viewBox="0 0 24 24"><path d="M4.5 4.5h6v6h-6zM13.5 4.5h6v6h-6zM4.5 13.5h6v6h-6zM13.5 13.5h6v6h-6z"/></symbol>
+    <symbol id="i-fit" viewBox="0 0 24 24"><path d="M4.5 9V4.5H9M15 4.5h4.5V9M19.5 15v4.5H15M9 19.5H4.5V15"/></symbol>
+  </defs>
+</svg>
+
+<!-- T1 · Entrar e criar conta -->
+<div class="screen" id="s-entrar" hidden>
+  <div class="auth">
+    <section class="auth-plate" aria-labelledby="auth-t">
+      <div class="auth-top"><a class="brand" href="#entrar"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="6.5"/><path d="M12 1.5v21M1.5 12h21"/></svg>Grafiaa</a><div class="proto-slot"></div></div>
+      <h1 id="auth-t">Desenhe letras. Invente alfabetos.</h1>
+      <p class="lede">Modifique uma fonte aberta em Latino, Grego ou Cirílico, ou crie um alfabeto novo e digite com ele no teclado. Tudo no navegador.</p>
+      <figure class="auth-fig reg" aria-label="O glifo a desenhado com nós, alças e linhas de métrica">
+        <span class="tick tl"></span><span class="tick tr"></span><span class="tick bl"></span><span class="tick br"></span>
+        <div class="void" aria-hidden="true"></div>
+        <svg class="gsvg" id="auth-svg" aria-hidden="true"></svg>
+      </figure>
+      <div class="auth-cap"><span>a · <span class="mono">U+0061</span> · Ana Sans · dados de exemplo</span><span>largura <span class="mono">520</span> · <span class="mono">15</span> nós</span></div>
+    </section>
+    <section class="auth-side" aria-label="Acesso">
+      <div class="tabs" role="tablist" aria-label="Acesso">
+        <button class="tab" role="tab" id="tab-in" aria-controls="auth-form" aria-selected="true">Entrar</button>
+        <button class="tab" role="tab" id="tab-up" aria-controls="auth-form" aria-selected="false" tabindex="-1">Criar conta</button>
+      </div>
+      <form class="auth-form" id="auth-form" role="tabpanel" aria-labelledby="tab-in" novalidate>
+        <div class="form-err" id="auth-err" role="alert"><svg class="i" aria-hidden="true"><use href="#i-alert"/></svg><span>E-mail ou senha incorretos.</span></div>
+        <div class="field" id="f-email">
+          <label for="email">E-mail</label>
+          <input class="input" id="email" type="email" autocomplete="email" placeholder="voce@exemplo.com" aria-describedby="email-err">
+          <p class="err-msg" id="email-err"><svg class="i" aria-hidden="true"><use href="#i-alert"/></svg><span>Informe um e-mail válido.</span></p>
+        </div>
+        <div class="field" id="f-pass">
+          <label for="pass">Senha</label>
+          <input class="input" id="pass" type="password" autocomplete="current-password" aria-describedby="pass-hint pass-err">
+          <p class="hint" id="pass-hint" hidden>Pelo menos 8 caracteres.</p>
+          <p class="err-msg" id="pass-err"><svg class="i" aria-hidden="true"><use href="#i-alert"/></svg><span>Informe a senha.</span></p>
+        </div>
+        <button class="btn btn-primary btn-lg btn-block" type="submit" id="auth-go">Entrar</button>
+      </form>
+      <p class="auth-note">Protótipo visual: qualquer e-mail entra, e nada é enviado nem salvo. Para ver a mensagem de erro, use erro@exemplo.com.</p>
+    </section>
+  </div>
+</div>
+
+<div class="screen" id="s-fontes" hidden></div>
+<div class="screen" id="s-fonte" hidden></div>
+<div class="screen ed" id="s-editor" hidden></div>
+<div class="screen" id="s-testar" hidden></div>
+
+<!-- T3 · Nova fonte -->
+<dialog class="dlg" id="dlg-nova" aria-labelledby="nova-t">
+  <form id="form-nova" novalidate>
+    <header class="dlg-head"><h2 id="nova-t">Nova fonte</h2><button type="button" class="icon-btn" data-close aria-label="Fechar"><svg class="i" aria-hidden="true"><use href="#i-x"/></svg></button></header>
+    <div class="dlg-body">
+      <div class="field" id="f-nome">
+        <label for="nome">Nome da fonte</label>
+        <div class="input-wrap"><input class="input" id="nome" maxlength="60" placeholder="Ex.: Ana Sans" autocomplete="off" aria-describedby="nome-err"><span class="count mono" id="nome-n">0/60</span></div>
+        <p class="err-msg" id="nome-err"><svg class="i" aria-hidden="true"><use href="#i-alert"/></svg><span>Dê um nome para a fonte.</span></p>
+      </div>
+      <fieldset class="starts">
+        <legend>Ponto de partida</legend>
+        <div class="start on" data-v="open">
+          <label class="start-main"><input type="radio" name="start" value="open" checked>
+            <span class="start-art"><span class="art-scripts" aria-hidden="true"><span>Aa</span><span>Ωα</span><span>Жж</span></span></span>
+            <b>Fonte aberta</b><span class="desc">Copia os glifos da Source Sans 3, licença SIL OFL 1.1. A original nunca muda.</span></label>
+          <div class="start-opts">
+            <label class="check"><input type="checkbox" name="sc" value="latino" checked>Latino <span class="hint"><span class="mono">116</span> glifos</span></label>
+            <label class="check"><input type="checkbox" name="sc" value="grego">Grego <span class="hint"><span class="mono">48</span> glifos</span></label>
+            <label class="check"><input type="checkbox" name="sc" value="cirilico">Cirílico <span class="hint"><span class="mono">66</span> glifos</span></label>
+          </div>
+        </div>
+        <div class="start" data-v="fict">
+          <label class="start-main"><input type="radio" name="start" value="fict">
+            <span class="start-art"><span class="art-keys" aria-hidden="true"><i class="on"></i><i class="on"></i><i class="on"></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i></span></span>
+            <b>Alfabeto fictício</b><span class="desc">26 glifos vazios, cada um ligado a uma tecla de a a z.</span></label>
+          <div class="start-opts">
+            <label class="check"><input type="checkbox" name="upper" disabled>Incluir também A a Z</label>
+          </div>
+        </div>
+        <div class="start" data-v="blank">
+          <label class="start-main"><input type="radio" name="start" value="blank">
+            <span class="start-art"><span class="art-blank" aria-hidden="true"></span></span>
+            <b>Em branco</b><span class="desc">Só o glifo space. Você adiciona o resto quando quiser.</span></label>
+        </div>
+        <div class="start" data-v="import">
+          <label class="start-main"><input type="radio" name="start" value="import">
+            <span class="start-art"><span class="art-file"><svg class="i" aria-hidden="true"><use href="#i-upload"/></svg><span class="mono">.otf · .ttf</span></span></span>
+            <b>Importar arquivo</b><span class="desc">Começa de uma fonte que está no seu computador.</span></label>
+          <div class="start-opts">
+            <div class="file-row"><label class="btn btn-ghost btn-sm" for="file-in">Escolher arquivo</label><input type="file" id="file-in" accept=".otf,.ttf" class="sr" disabled><span class="fname" id="file-name">Nenhum arquivo escolhido</span></div>
+          </div>
+        </div>
+      </fieldset>
+    </div>
+    <footer class="dlg-foot"><button type="button" class="btn btn-ghost" data-close>Cancelar</button><button type="submit" class="btn btn-primary">Criar fonte</button></footer>
+  </form>
+</dialog>
+
+<dialog class="dlg dlg-sm" id="dlg-confirm" aria-labelledby="cf-t">
+  <form id="form-confirm" novalidate>
+    <header class="dlg-head"><h2 id="cf-t">Excluir fonte?</h2></header>
+    <div class="dlg-body" id="cf-body"></div>
+    <footer class="dlg-foot"><button type="button" class="btn btn-ghost" data-close>Cancelar</button><button type="submit" class="btn btn-primary" id="cf-go">Excluir</button></footer>
+  </form>
+</dialog>
+
+<div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+<nav class="proto" id="proto" aria-label="Telas do protótipo">
+  <button type="button" id="proto-btn" aria-expanded="false" aria-controls="proto-menu" aria-label="Telas do protótipo"><svg class="i" aria-hidden="true"><use href="#i-grid"/></svg><span>Telas do protótipo</span></button>
+  <div class="menu" id="proto-menu" hidden>
+    <a href="#entrar">Entrar e criar conta <span class="mono">T1</span></a>
+    <a href="#fontes">Minhas fontes <span class="mono">T2</span></a>
+    <a href="#nova">Nova fonte <span class="mono">T3</span></a>
+    <a href="#fonte/ana">Visão da fonte · Ana Sans <span class="mono">T4</span></a>
+    <a href="#fonte/elfico">Visão da fonte · Élfico do Norte <span class="mono">T4</span></a>
+    <a href="#editor/ana/a">Editor · a da Ana Sans <span class="mono">T5</span></a>
+    <a href="#editor/elfico/o">Editor vazio · o do Élfico <span class="mono">T5</span></a>
+    <a href="#testar/ana">Testar fonte · Ana Sans <span class="mono">T6</span></a>
+    <a href="#testar/elfico">Testar fonte · Élfico do Norte <span class="mono">T6</span></a>
+  </div>
+</nav>
+
+<script>
+/* =========================================================
+   utilidades
+   ========================================================= */
+const $=(s,r=document)=>r.querySelector(s);
+const $$=(s,r=document)=>[...r.querySelectorAll(s)];
+const esc=s=>String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+const ic=id=>`<svg class="i" aria-hidden="true"><use href="#i-${id}"/></svg>`;
+const ticks=()=>'<span class="tick tl"></span><span class="tick tr"></span><span class="tick bl"></span><span class="tick br"></span>';
+const U=c=>c.codePointAt(0).toString(16).toUpperCase().padStart(4,'0');
+const num=v=>v<0?'−'+Math.abs(v):String(v);
+const mn=s=>esc(s).replace(/(\d[\d:\/.,]*\d|\d)/g,'<span class="mono">$1</span>');
+const TAG='<span class="demo-tag">Dados de exemplo</span>';
+const SLOT='<div class="proto-slot"></div>';
+const BRAND=`<a class="brand" href="#fontes" aria-label="Grafiaa, ir para Minhas fontes"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="6.5"/><path d="M12 1.5v21M1.5 12h21"/></svg><span>Grafiaa</span></a>`;
+let toastT;
+function toast(msg){const t=$('#toast');t.textContent=msg;t.classList.add('on');clearTimeout(toastT);toastT=setTimeout(()=>t.classList.remove('on'),3400);}
+function hhmm(){const d=new Date();return String(d.getHours()).padStart(2,'0')+':'+String(d.getMinutes()).padStart(2,'0');}
+
+/* =========================================================
+   dados de exemplo (inventados)
+   ========================================================= */
+const METRICS=[[800,'Ascendente'],[700,'Maiúsculas'],[500,'Altura-x'],[0,'Base'],[-200,'Descendente']];
+
+// "a" desenhado à mão no esquema de pontos UFO: line / curve / off (alça); 1 = nó suave
+const A_PTS=[[
+  [452,0,'line'],[452,318,'line',1],[452,440,'off'],[384,512,'off'],[268,512,'curve',1],
+  [196,512,'off'],[144,490,'off'],[100,456,'curve'],[134,394,'line'],
+  [172,418,'off'],[210,436,'off'],[256,436,'curve',1],[336,436,'off'],[372,390,'off'],[372,316,'curve'],
+  [150,300,'off'],[52,240,'off'],[52,136,'curve',1],[52,48,'off'],[114,-10,'off'],[196,-10,'curve',1],
+  [278,-10,'off'],[334,28,'off'],[372,76,'curve'],[378,0,'line']
+],[
+  [372,236,'line'],[190,222,'off'],[136,194,'off'],[136,140,'curve',1],
+  [136,88,'off'],[172,60,'off'],[222,60,'curve',1],[288,60,'off'],[340,96,'off'],[372,144,'curve']
+]];
+const mkContours=src=>src.map(c=>({closed:true,pts:c.map(([x,y,t,s])=>({x,y,t,s:!!s}))}));
+const clone=o=>JSON.parse(JSON.stringify(o));
+
+// símbolos inventados do Élfico do Norte (teclas a–n) e das Runas da Ilha (a–c), traço em caixa 100×100
+const ELF=['<path d="M28 84V32q0-16 17-16 21 0 21 20 0 17-20 19"/><circle cx="63" cy="78" r="6"/>',
+  '<path d="M72 28a25 25 0 1 0 0 44l12 14"/>',
+  '<path d="M24 22q26 24 0 50M52 18v68M52 50q24-12 28-34"/>',
+  '<path d="M26 24q24 18 48 0M50 30v54"/>',
+  '<path d="M30 20v64M30 52q40-8 40 32"/>',
+  '<path d="M22 50q28-38 56 0q-28 38-56 0z"/><circle cx="50" cy="50" r="6"/>',
+  '<path d="M30 18l20 32-20 34M70 18v66"/>',
+  '<path d="M22 80q28-58 56 0M50 18v26"/>',
+  '<path d="M50 16v52M34 30h32"/><circle cx="50" cy="82" r="6"/>',
+  '<path d="M28 20q44 0 44 30t-44 32"/>',
+  '<path d="M26 84V42a24 24 0 0 1 48 0v42"/>',
+  '<path d="M30 18l40 66M70 18L50 52"/>',
+  '<path d="M22 32q14 24 28 0t28 0M22 66q14 24 28 0t28 0"/>',
+  '<path d="M50 16a34 34 0 1 1-.1 0M50 40v20"/>'];
+const RUN=['<path d="M30 84L50 16l20 68M40 40l20 24"/>','<path d="M26 20h48M50 20v64M26 84q24-24 48 0"/>','<path d="M30 20l40 30-40 30M70 20v60"/>'];
+
+function openGlyphs(scripts){
+  const g=[];
+  const add=(ch,name,script)=>g.push({ch,name,cp:U(ch),script,drawn:true});
+  if(scripts.includes('latino')){
+    for(const c of 'ABCDEFGHIJKLMNOPQRSTUVWXYZ') add(c,c,'latino');
+    for(const c of 'abcdefghijklmnopqrstuvwxyz') add(c,c,'latino');
+    'zero one two three four five six seven eight nine'.split(' ').forEach((n,i)=>add(String(i),n,'latino'));
+    [['.','period'],[',','comma'],[':','colon'],[';','semicolon'],['!','exclam'],['?','question'],["'",'quotesingle'],['"','quotedbl'],['(','parenleft'],[')','parenright'],['[','bracketleft'],[']','bracketright'],['{','braceleft'],['}','braceright'],['-','hyphen'],['–','endash'],['—','emdash'],['_','underscore'],['/','slash'],['\\','backslash'],['@','at'],['#','numbersign'],['$','dollar'],['%','percent'],['&','ampersand'],['*','asterisk'],['+','plus'],['=','equal'],['<','less'],['>','greater']].forEach(([c,n])=>add(c,n,'latino'));
+    const A=[['Á','Aacute'],['À','Agrave'],['Â','Acircumflex'],['Ã','Atilde'],['É','Eacute'],['Ê','Ecircumflex'],['Í','Iacute'],['Ó','Oacute'],['Ô','Ocircumflex'],['Õ','Otilde'],['Ú','Uacute'],['Ç','Ccedilla']];
+    A.forEach(([c,n])=>add(c,n,'latino'));
+    A.forEach(([c,n])=>add(c.toLowerCase(),n[0].toLowerCase()+n.slice(1),'latino'));
+  }
+  if(scripts.includes('grego')){
+    const N='Alpha Beta Gamma Delta Epsilon Zeta Eta Theta Iota Kappa Lambda Mu Nu Xi Omicron Pi Rho Sigma Tau Upsilon Phi Chi Psi Omega'.split(' ');
+    const C=[...'ΑΒΓΔΕΖΗΘΙΚΛΜΝΞΟΠΡΣΤΥΦΧΨΩ'];
+    C.forEach((c,i)=>add(c,N[i],'grego'));
+    C.forEach((c,i)=>add(c.toLowerCase(),N[i].toLowerCase(),'grego'));
+  }
+  if(scripts.includes('cirilico')){
+    const N='A Be Ve Ge De Ie Io Zhe Ze Ii Iishort Ka El Em En O Pe Er Es Te U Ef Ha Tse Che Sha Shcha Hardsign Yeru Softsign Ereversed Iu Ia'.split(' ');
+    const C=[...'АБВГДЕЁЖЗИЙКЛМНОПРСТУФХЦЧШЩЪЫЬЭЮЯ'];
+    C.forEach((c,i)=>add(c,N[i]+'-cy','cirilico'));
+    C.forEach((c,i)=>add(c.toLowerCase(),N[i].toLowerCase()+'-cy','cirilico'));
+  }
+  g.push({ch:' ',name:'space',cp:'0020',script:'outros',drawn:true});
+  return g;
+}
+function fictGlyphs(preset,upper){
+  const g=[];
+  [...'abcdefghijklmnopqrstuvwxyz'].forEach((c,i)=>g.push({ch:c,name:c,cp:U(c),script:'latino',drawn:!!preset[i],sym:preset[i]||null,contours:null,width:600}));
+  if(upper) [...'ABCDEFGHIJKLMNOPQRSTUVWXYZ'].forEach(c=>g.push({ch:c,name:c,cp:U(c),script:'latino',drawn:false,sym:null,contours:null,width:600}));
+  g.push({ch:' ',name:'space',cp:'0020',script:'outros',drawn:true});
+  return g;
+}
+
+const state={
+  email:'ana@exemplo.com', showEmpty:false, filter:'todos', query:'', selGlyph:null, seq:0,
+  fonts:[
+    {id:'ana',name:'Ana Sans',kind:'open',scripts:['latino','grego','cirilico'],weight:400,date:'alterada hoje, 14:32'},
+    {id:'elfico',name:'Élfico do Norte',kind:'fict',preset:ELF,date:'alterada ontem, 22:10'},
+    {id:'cirilico',name:'Cirílico Redondo',kind:'open',scripts:['latino','cirilico'],weight:300,date:'alterada em 12/10/2026'},
+    {id:'runas',name:'Runas da Ilha',kind:'fict',preset:RUN,date:'alterada em 10/10/2026'},
+    {id:'placa',name:'Placa de Feira',kind:'open',scripts:['latino'],weight:900,date:'alterada em 05/10/2026'},
+    {id:'rascunho',name:'Rascunho',kind:'blank',date:'criada em 03/10/2026'}
+  ]
+};
+function getFont(id){
+  const f=state.fonts.find(x=>x.id===id); if(!f) return null;
+  if(!f.glyphs){
+    f.glyphs = f.kind==='open' ? openGlyphs(f.scripts)
+             : f.kind==='fict' ? fictGlyphs(f.preset||[],f.upper)
+             : [{ch:' ',name:'space',cp:'0020',script:'outros',drawn:true}];
+  }
+  return f;
+}
+function fontStats(f){
+  getFont(f.id);
+  const keys=f.glyphs.filter(g=>g.script!=='outros');
+  const empty=keys.filter(g=>!g.drawn).length;
+  const open=f.glyphs.filter(g=>g.contours&&g.contours.some(c=>!c.closed)).length;
+  return {total:f.glyphs.length,empty,open,drawn:keys.length-empty,keys:keys.length};
+}
+
+/* =========================================================
+   desenho de glifos em SVG
+   ========================================================= */
+function contourD(c){
+  const p=c.pts,n=p.length; if(!n) return '';
+  const s=p.findIndex(q=>q.t!=='off'); if(s<0) return '';
+  let d=`M${p[s].x} ${-p[s].y}`,offs=[];
+  for(let k=1;k<=n;k++){
+    if(k===n&&!c.closed) break;
+    const q=p[(s+k)%n];
+    if(q.t==='off'){offs.push(q);continue;}
+    d+= offs.length===2 ? ` C${offs[0].x} ${-offs[0].y} ${offs[1].x} ${-offs[1].y} ${q.x} ${-q.y}` : ` L${q.x} ${-q.y}`;
+    offs=[];
+  }
+  return c.closed?d+'Z':d;
+}
+const closedD=cs=>cs.filter(c=>c.closed).map(contourD).join(' ');
+function glyphInline(g){
+  if(g.contours&&g.contours.some(c=>c.closed)){
+    const w=g.width||600;
+    return `<svg class="gi" viewBox="0 -800 ${w} 1000" style="width:${(w/1000).toFixed(3)}em" aria-hidden="true"><path fill-rule="evenodd" d="${closedD(g.contours)}"/></svg>`;
+  }
+  if(g.sym) return `<svg class="gi" viewBox="0 -2 100 104" style="width:.62em" aria-hidden="true"><g class="fx" style="stroke-width:10">${g.sym}</g></svg>`;
+  return null;
+}
+
+// figura estática do "a" para a tela de entrada
+function staticGlyph(svg){
+  const r=svg.getBoundingClientRect(); if(!r.width) return;
+  const W=520,box={x:-300,y:-930,w:W+600,h:1260};
+  const s=Math.min(r.width/box.w,r.height/box.h),k=1/s;
+  let o='';
+  for(const [y,l] of METRICS){
+    o+=`<line class="ml${y===0?' base':''}" x1="-6000" x2="6000" y1="${-y}" y2="${-y}"/>`;
+    o+=`<text class="lab" x="${-16*k}" y="${-y-6*k}" text-anchor="end" font-size="${11*k}">${l}</text><text class="val" x="${W+16*k}" y="${-y-6*k}" font-size="${10.5*k}">${num(y)}</text>`;
+  }
+  o+=`<line class="sb" x1="0" x2="0" y1="-6000" y2="6000"/><line class="sb" x1="${W}" x2="${W}" y1="-6000" y2="6000"/>`;
+  const cs=mkContours(A_PTS);
+  o+=`<path class="gp" fill-rule="evenodd" d="${closedD(cs)}"/>`;
+  let h='',nd='';
+  for(const c of cs){const n=c.pts.length;c.pts.forEach((q,i)=>{
+    if(q.t==='off'){const a=c.pts[(i-1+n)%n].t!=='off'?c.pts[(i-1+n)%n]:c.pts[(i+1)%n];h+=`<line class="hl" x1="${a.x}" y1="${-a.y}" x2="${q.x}" y2="${-q.y}"/><circle class="hd" cx="${q.x}" cy="${-q.y}" r="${3*k}"/>`;}
+    else nd+= q.s?`<circle class="nd" cx="${q.x}" cy="${-q.y}" r="${4.5*k}"/>`:`<rect class="nd" x="${q.x-4*k}" y="${-q.y-4*k}" width="${8*k}" height="${8*k}"/>`;
+  });}
+  svg.setAttribute('viewBox',`${box.x} ${box.y} ${box.w} ${box.h}`);
+  svg.innerHTML=o+h+nd;
+}
+
+function stampSVG(total){
+  const id='sp'+(++state.seq);
+  return `<svg class="stamp" viewBox="0 0 120 120" role="img" aria-label="Selo: pronta para exportar, ${total} glifos">
+    <defs><path id="${id}" d="M60 60m-43 0a43 43 0 1 1 86 0a43 43 0 1 1-86 0"/></defs>
+    <circle cx="60" cy="60" r="58" fill="#DCDDF3"/><circle cx="60" cy="60" r="31" fill="none" stroke="#4A4EB0" stroke-width="1"/>
+    <g class="spin"><text font-family="Host Grotesk" font-weight="500" font-size="9.6" letter-spacing="1.7" fill="#16181A"><textPath href="#${id}">PRONTA PARA EXPORTAR · ${total} GLIFOS · </textPath></text></g>
+    <text x="60" y="65" text-anchor="middle" font-family="Host Grotesk" font-weight="600" font-size="15" fill="#16181A">.otf</text></svg>`;
+}
+
+/* =========================================================
+   T2 · Minhas fontes
+   ========================================================= */
+function cardArt(f){
+  getFont(f.id);
+  let inner;
+  if(f.kind==='open') inner=`<text class="st" x="180" y="121" text-anchor="middle" font-weight="${f.weight}">Aa</text>`;
+  else if(f.kind==='fict'){
+    const drawn=f.glyphs.filter(g=>g.drawn&&g.script!=='outros').slice(0,3);
+    inner = drawn.length ? drawn.map((g,i)=>{
+      const x=180-(drawn.length*96-8)/2+i*96;
+      if(g.sym) return `<g class="fx" transform="translate(${x} 42) scale(.88)">${g.sym}</g>`;
+      return `<svg x="${x}" y="40" width="88" height="88" viewBox="0 -800 ${g.width} 1000"><path fill-rule="evenodd" d="${closedD(g.contours)}" fill="#16181A"/></svg>`;
+    }).join('') : `<text class="st ghost" x="180" y="121" text-anchor="middle">a b c</text>`;
+  } else inner=`<text class="st ghost" x="180" y="121" text-anchor="middle" font-weight="400">Aa</text>`;
+  return `<svg viewBox="0 0 360 170" aria-hidden="true">${inner}</svg>`;
+}
+function cardMeta(f){
+  const st=fontStats(f);
+  if(f.kind==='fict') return `${st.drawn} de ${st.keys} teclas · ${f.date}`;
+  if(f.kind==='blank') return `${st.total} glifo · ${f.date}`;
+  return `${st.total} glifos · ${f.date}`;
+}
+function renderFontes(){
+  const el=$('#s-fontes'),n=state.fonts.length,empty=state.showEmpty||n===0;
+  const body = empty ? `<div class="empty"><div class="void" aria-hidden="true"></div>
+      <h2>Você ainda não tem nenhuma fonte</h2>
+      <p>Comece de uma fonte aberta em Latino, Grego ou Cirílico e mude o desenho das letras. Ou invente um alfabeto, desenhe um símbolo para cada tecla e digite com ele.</p>
+      <a class="btn btn-primary btn-lg" href="#nova">${ic('plus')}Criar minha primeira fonte</a></div>`
+    : `<div class="cards">${state.fonts.map(f=>`
+      <article class="card" data-id="${f.id}">
+        <a class="card-art reg" href="#fonte/${f.id}" tabindex="-1" aria-hidden="true">${ticks()}${cardArt(f)}</a>
+        <div class="card-meta">
+          <h2 class="card-name"><a href="#fonte/${f.id}">${esc(f.name)}</a></h2>
+          <p>${mn(cardMeta(f))}</p>
+          <button class="icon-btn card-menu" type="button" aria-haspopup="menu" aria-expanded="false" aria-label="Mais ações para ${esc(f.name)}">${ic('dots')}</button>
+        </div>
+      </article>`).join('')}</div>`;
+  el.innerHTML=`<header class="appbar">${BRAND}<div class="sp"></div>${TAG}<span class="who">${esc(state.email)}</span>${SLOT}<a class="btn btn-ghost btn-sm" href="#entrar">Sair</a></header>
+    <main class="page" id="main">
+      <div class="page-head"><div><h1 tabindex="-1">Minhas fontes</h1><p class="meta">${mn(`${empty?0:n} de 20 fontes`)}</p></div>
+        ${empty?'':`<a class="btn btn-primary" href="#nova">${ic('plus')}Nova fonte</a>`}</div>
+      ${body}
+      <p class="demo-toggle"><button class="btn-quiet" type="button" id="toggle-empty">${empty?'Voltar para o exemplo com fontes':'Ver como fica a tela sem nenhuma fonte'}</button></p>
+    </main>`;
+  $('#toggle-empty').onclick=()=>{state.showEmpty=!empty;renderFontes();};
+  $$('.card-menu',el).forEach(b=>b.onclick=e=>{e.stopPropagation();openCardMenu(b);});
+}
+function closeMenus(){$$('.menu.pop').forEach(m=>m.remove());$$('[aria-expanded="true"]').forEach(b=>{if(b.id!=='proto-btn')b.setAttribute('aria-expanded','false')});}
+function popMenu(anchor,items){
+  closeMenus();
+  const m=document.createElement('div');m.className='menu pop';m.setAttribute('role','menu');
+  m.innerHTML=items.map((it,i)=>it==='-'?'<hr>':it.h?`<p class="menu-h">${it.h}</p>`:`<button role="menuitem" type="button" data-i="${i}" class="${it.danger?'danger':''}">${it.icon?ic(it.icon):''}${it.label}</button>`).join('');
+  document.body.appendChild(m);
+  const r=anchor.getBoundingClientRect();
+  const left=Math.min(r.right-m.offsetWidth,innerWidth-m.offsetWidth-12);
+  m.style.left=Math.max(12,left+scrollX)+'px';m.style.top=(r.bottom+6+scrollY)+'px';
+  anchor.setAttribute('aria-expanded','true');
+  $$('button',m).forEach(b=>b.onclick=()=>{closeMenus();items[+b.dataset.i].run();});
+  const first=$('button',m);first&&first.focus();
+  m.onkeydown=e=>{const bs=$$('button',m),i=bs.indexOf(document.activeElement);
+    if(e.key==='ArrowDown'){e.preventDefault();bs[(i+1)%bs.length].focus();}
+    if(e.key==='ArrowUp'){e.preventDefault();bs[(i-1+bs.length)%bs.length].focus();}
+    if(e.key==='Escape'){closeMenus();anchor.focus();}};
+}
+function openCardMenu(btn){
+  const id=btn.closest('.card').dataset.id,f=getFont(id);
+  popMenu(btn,[
+    {label:'Renomear',icon:'edit',run:()=>{
+      const h=btn.closest('.card').querySelector('.card-name');
+      h.innerHTML=`<input class="input" style="height:32px;font-size:15px" maxlength="60" value="${esc(f.name)}" aria-label="Novo nome da fonte">`;
+      const inp=$('input',h);inp.focus();inp.select();
+      const done=ok=>{const v=inp.value.trim();if(ok&&v){f.name=v;toast(`Fonte renomeada para “${v}”.`);}renderFontes();};
+      inp.onkeydown=e=>{if(e.key==='Enter')done(true);if(e.key==='Escape')done(false);};
+      inp.onblur=()=>done(true);
+    }},
+    {label:'Excluir',icon:'trash',danger:true,run:()=>confirmDelete(f)}
+  ]);
+}
+function confirmDelete(f){
+  const d=$('#dlg-confirm');
+  $('#cf-body').innerHTML=`<p>A fonte <b>${esc(f.name)}</b> e todos os seus glifos serão apagados. Isso não tem volta.</p>`;
+  $('#form-confirm').onsubmit=e=>{e.preventDefault();state.fonts=state.fonts.filter(x=>x!==f);d.close();renderFontes();toast(`“${f.name}” foi excluída.`);};
+  d.showModal();
+}
+
+/* =========================================================
+   T3 · Nova fonte
+   ========================================================= */
+function openNova(){
+  const d=$('#dlg-nova');
+  if(d.open) return;
+  $('#form-nova').reset();$('#f-nome').classList.remove('err');$('#nome-n').textContent='0/60';$('#file-name').textContent='Nenhum arquivo escolhido';
+  syncStarts();
+  d.showModal();$('#nome').focus();
+}
+function syncStarts(){
+  const v=$('#form-nova').start.value;
+  $$('.start').forEach(s=>{const on=s.dataset.v===v;s.classList.toggle('on',on);$$('.start-opts input',s).forEach(i=>i.disabled=!on);});
+}
+$('#form-nova').addEventListener('change',e=>{if(e.target.name==='start')syncStarts();});
+$('#nome').addEventListener('input',e=>{$('#nome-n').textContent=e.target.value.length+'/60';if(e.target.value.trim())$('#f-nome').classList.remove('err');});
+$('#file-in').addEventListener('change',e=>{$('#file-name').textContent=e.target.files[0]?e.target.files[0].name:'Nenhum arquivo escolhido';});
+$('#form-nova').addEventListener('submit',e=>{
+  e.preventDefault();
+  const fm=e.target,name=$('#nome').value.trim();
+  if(!name){$('#f-nome').classList.add('err');$('#nome').focus();return;}
+  const v=fm.start.value,id='f'+Date.now().toString(36);
+  let f;
+  if(v==='open'){const sc=$$('input[name=sc]:checked',fm).map(i=>i.value);f={id,name,kind:'open',scripts:sc.length?sc:['latino'],weight:400};}
+  else if(v==='import'){f={id,name,kind:'open',scripts:['latino'],weight:600};}
+  else if(v==='fict'){f={id,name,kind:'fict',preset:[],upper:fm.upper.checked};}
+  else f={id,name,kind:'blank'};
+  f.date='criada agora';
+  state.fonts.unshift(f);state.showEmpty=false;
+  go('fonte/'+id);
+  $('#dlg-nova').close();
+});
+$('#dlg-nova').addEventListener('close',()=>{if(curRoute==='nova')go('fontes');});
+document.addEventListener('click',e=>{const c=e.target.closest('[data-close]');if(c)c.closest('dialog').close();});
+
+/* =========================================================
+   T4 · Visão da fonte
+   ========================================================= */
+const FILTERS=[['todos','Todos'],['latino','Latino'],['grego','Grego'],['cirilico','Cirílico'],['outros','Outros'],['vazio','Sem desenho']];
+const SCRIPT_NAMES={latino:'Latino',grego:'Grego',cirilico:'Cirílico',outros:'Outros'};
+let curFont=null;
+function renderFonte(id){
+  const f=getFont(id); if(!f){go('fontes');return;}
+  if(curFont!==id){state.filter='todos';state.query='';state.selGlyph=null;curFont=id;}
+  const st=fontStats(f),el=$('#s-fonte');
+  const cnt=k=>k==='todos'?f.glyphs.length:k==='vazio'?st.empty:f.glyphs.filter(g=>g.script===k).length;
+  const meta= f.kind==='open'?`${mn(st.total+' glifos')} · a partir da Source Sans 3`
+            : f.kind==='fict'?`${mn(st.total+' glifos')} · alfabeto fictício · ${mn(st.drawn+' de '+st.keys)} teclas desenhadas`
+            : `${mn(st.total+' glifo')} · em branco`;
+  const ready=st.empty===0&&st.open===0&&st.total>1;
+  el.innerHTML=`<header class="appbar">${BRAND}<nav class="crumbs" aria-label="Você está em"><a href="#fontes">Minhas fontes</a><span aria-hidden="true">/</span><b>${esc(f.name)}</b></nav><div class="sp"></div>${TAG}<span class="who">${esc(state.email)}</span>${SLOT}<a class="btn btn-ghost btn-sm" href="#entrar">Sair</a></header>
+  <div class="fv">
+    <aside class="fv-side" aria-label="Filtros e informações">
+      <h2 class="side-h">Sistemas de escrita</h2>
+      <div class="filters" role="group" aria-label="Filtrar glifos">${FILTERS.map(([k,l])=>`<button type="button" data-f="${k}" aria-pressed="${state.filter===k}"><span>${l}</span><span class="mono">${cnt(k)}</span></button>`).join('')}</div>
+      <h2 class="side-h info-h">Informações da fonte</h2>
+      <div class="credits">
+        <label class="row"><span>Nome</span><input value="${esc(f.name)}" aria-label="Nome da fonte" data-k="name" style="font-family:var(--ui)"></label>
+        ${METRICS.filter(m=>m[0]!==0).map(([v,l])=>`<label class="row"><span>${l}</span><input value="${num(v)}" aria-label="${l}"></label>`).join('')}
+        <div class="row"><span>Unidades por em</span><span class="ro">1000</span></div>
+        <div class="row"><span>Licença</span><span class="ro">${f.kind==='open'?'OFL 1.1':'—'}</span></div>
+      </div>
+      <div class="side-foot">${ready?stampSVG(st.total):st.empty?`<div class="pending reg">${ticks()}<b>${ic('alert')}${st.empty} ${st.empty===1?'tecla':'teclas'} sem desenho</b><p>Elas ficam de fora do arquivo exportado.</p><button class="btn btn-ghost btn-sm" type="button" data-f="vazio">Ver quais são</button></div>`:''}</div>
+    </aside>
+    <main class="fv-main" id="main">
+      <div class="fv-head">
+        <div><h1 tabindex="-1">${esc(f.name)}</h1><p class="meta">${meta}</p></div>
+        <div class="fv-actions">
+          <label class="search">${ic('search')}<input type="search" id="q" placeholder="Buscar por nome ou caractere" aria-label="Buscar glifo por nome ou caractere" value="${esc(state.query)}"></label>
+          <button class="btn btn-ghost" type="button" id="add-btn" aria-haspopup="menu" aria-expanded="false">${ic('plus')}Adicionar glifos</button>
+          <a class="btn btn-ghost" href="#testar/${f.id}">${ic('type')}Testar fonte</a>
+          <button class="btn btn-primary" type="button" data-export="${f.id}">${ic('download')}Exportar .otf</button>
+        </div>
+      </div>
+      <p class="fv-status" id="fv-status" aria-live="polite"></p>
+      <div id="fv-grid"></div>
+    </main>
+  </div>`;
+  $$('[data-f]',el).forEach(b=>b.onclick=()=>{state.filter=b.dataset.f;$$('.filters [data-f]',el).forEach(x=>x.setAttribute('aria-pressed',String(x.dataset.f===state.filter)));renderGrid(f);});
+  $('#q').oninput=e=>{state.query=e.target.value;renderGrid(f);};
+  $('#add-btn').onclick=e=>{e.stopPropagation();popMenu(e.currentTarget,[
+    {label:'Um glifo avulso…',icon:'plus',run:()=>toast('Protótipo: aqui abriria uma janela com nome e caractere do glifo.')},
+    '-',{h:'Um conjunto'},
+    {label:'Latino',run:()=>toast('Protótipo: o conjunto Latino seria adicionado (116 glifos).')},
+    {label:'Grego',run:()=>toast('Protótipo: o conjunto Grego seria adicionado (48 glifos).')},
+    {label:'Cirílico',run:()=>toast('Protótipo: o conjunto Cirílico seria adicionado (66 glifos).')},
+    {label:'Teclado de a a z',run:()=>toast('Protótipo: 26 glifos vazios seriam adicionados, um por tecla.')}
+  ]);};
+  $$('.credits input',el).forEach(i=>i.onchange=()=>{if(i.dataset.k==='name'&&i.value.trim()){f.name=i.value.trim();renderFonte(f.id);}toast('Salvo.');});
+  renderGrid(f);
+}
+function cellArt(g,f){
+  if(g.name==='space') return `<svg viewBox="0 0 100 68" aria-hidden="true"><path class="spc" d="M24 52v8h52v-8"/></svg>`;
+  if(g.contours&&g.contours.some(c=>c.closed)) return `<svg viewBox="0 0 100 68" aria-hidden="true"><svg x="${50-g.width*.054/2}" y="18.8" width="${g.width*.054}" height="54" viewBox="0 -800 ${g.width} 1000" overflow="visible"><path class="gp" fill-rule="evenodd" d="${closedD(g.contours)}"/></svg></svg>`;
+  if(g.sym) return `<svg viewBox="0 0 100 68" aria-hidden="true"><g class="fx" transform="translate(21 8) scale(.58)">${g.sym}</g></svg>`;
+  if(!g.drawn) return `<span class="void" aria-hidden="true"><span>${esc(g.ch)}</span></span>`;
+  return `<svg viewBox="0 0 100 68" aria-hidden="true"><text class="gl" x="50" y="62" text-anchor="middle" font-weight="${f.weight||400}">${esc(g.ch)}</text></svg>`;
+}
+function renderGrid(f){
+  const q=state.query.trim().toLowerCase();
+  let list=f.glyphs.filter(g=>state.filter==='todos'||(state.filter==='vazio'?!g.drawn:g.script===state.filter));
+  if(q) list=list.filter(g=>g.name.toLowerCase().includes(q)||g.ch.toLowerCase()===q||('u+'+g.cp.toLowerCase()).includes(q));
+  const grid=$('#fv-grid'),status=$('#fv-status');
+  const label=FILTERS.find(x=>x[0]===state.filter)[1];
+  status.innerHTML=`<span><b>${list.length}</b> ${list.length===1?'glifo':'glifos'}${state.filter!=='todos'?` em ${label}`:''}${q?` para “${esc(state.query)}”`:''}</span><span aria-hidden="true">·</span><span>Clique duas vezes num glifo para abrir no editor.</span>`;
+  if(!list.length){
+    grid.innerHTML=`<div class="no-res reg">${ticks()}<p>${f.kind==='blank'&&!q?'Esta fonte só tem o glifo space. Use <b>Adicionar glifos</b> para começar.':state.filter==='vazio'&&!q?'Todas as teclas já têm desenho.':`Nenhum glifo encontrado para “${esc(state.query)}”. Busque pelo nome, como <span class="mono">alpha</span>, ou pelo caractere, como <span class="mono">α</span>.`}</p></div>`;
+    return;
+  }
+  const groups=['latino','grego','cirilico','outros'].map(s=>[s,list.filter(g=>g.script===s)]).filter(x=>x[1].length);
+  grid.innerHTML=groups.map(([s,gs])=>`<section class="grp" aria-label="${SCRIPT_NAMES[s]}"><div class="grp-h"><h2>${SCRIPT_NAMES[s]}</h2><span class="mono">${gs.length}</span></div>
+    <div class="ggrid" role="listbox" aria-label="Glifos ${SCRIPT_NAMES[s]}">${gs.map(g=>{const i=f.glyphs.indexOf(g);return `<button type="button" class="cell" role="option" data-g="${i}" aria-selected="${state.selGlyph===i}" aria-label="${esc(g.name)}, U+${g.cp}${g.drawn?'':', sem desenho'}">${ticks()}${cellArt(g,f)}<span class="cm"><span class="cn">${esc(g.name)}</span><span class="cc">U+${g.cp}</span></span></button>`;}).join('')}</div></section>`).join('');
+  $$('.cell',grid).forEach(c=>{
+    c.onclick=()=>{state.selGlyph=+c.dataset.g;$$('.cell',grid).forEach(x=>x.setAttribute('aria-selected',String(x===c)));};
+    c.ondblclick=()=>openGlyph(f,f.glyphs[+c.dataset.g]);
+    c.onkeydown=e=>{if(e.key==='Enter'){e.preventDefault();openGlyph(f,f.glyphs[+c.dataset.g]);}};
+  });
+}
+function editable(f,g){return g.name!=='space'&&(f.kind==='open'?g.ch==='a':!g.sym);}
+function openGlyph(f,g){
+  if(editable(f,g)){go(`editor/${f.id}/${encodeURIComponent(g.name)}`);return;}
+  if(g.name==='space') toast('O space não tem desenho, só largura. No app de verdade, ela muda no inspetor.');
+  else if(f.kind==='open') toast('Protótipo: só o “a” tem os nós carregados. Clique duas vezes no a.');
+  else toast('Protótipo: os símbolos de exemplo não abrem no editor. Abra uma tecla vazia, como o “o”.');
+}
+
+/* =========================================================
+   T5 · Editor de glifo
+   ========================================================= */
+const TOOLS=[['select','Selecionar','V'],['pen','Caneta','P'],['rect','Retângulo','R'],['ellipse','Elipse','E'],['hand','Mão','Espaço']];
+const HINTS={select:'Clique num nó para selecionar e arraste para mover. Setas movem 1 unidade (com Shift, 10). Clique duas vezes num nó para trocar entre canto e suave.',
+  pen:'Cada clique cria um nó de canto. Clique no primeiro nó para fechar o contorno. Esc termina um contorno aberto.',
+  rect:'Arraste na área de desenho para criar um retângulo.',ellipse:'Arraste na área de desenho para criar uma elipse.',hand:'Arraste para mover a tela. Também dá para segurar a barra de espaço.'};
+const ED={};
+function renderEditor(fid,gname){
+  const f=getFont(fid); if(!f){go('fontes');return;}
+  const g=f.glyphs.find(x=>x.name===gname);
+  if(!g||!editable(f,g)){go('fonte/'+fid);return;}
+  if(!g.contours) g.contours = (f.kind==='open'&&g.ch==='a') ? mkContours(A_PTS) : [];
+  if(!g.width) g.width = f.kind==='open'?520:600;
+  Object.assign(ED,{f,g,sel:null,draft:null,drawing:null,drag:null,pan:null,space:false,hist:[],fut:[],vb:null,
+    tool:g.contours.length?'select':'pen',saved:'14:32',
+    preview: f.kind==='open'?'banana para Ana':`ab${g.ch}cd ${g.ch}${g.ch}`,
+    zoom:1});
+  const el=$('#s-editor');
+  const keys=f.glyphs.filter(x=>x.script!=='outros');
+  el.innerHTML=`
+  <header class="ed-top">
+    ${BRAND}
+    <a class="ed-back" href="#fonte/${f.id}">${ic('back')}<span>Voltar para <b>${esc(f.name)}</b></span></a>
+    <div class="gnav">
+      <button class="icon-btn" type="button" id="g-prev" aria-label="Glifo anterior">${ic('chev-l')}</button>
+      <span class="gcur"><b>${esc(g.ch)}</b><small>U+${g.cp}</small></span>
+      <button class="icon-btn" type="button" id="g-next" aria-label="Próximo glifo">${ic('chev-r')}</button>
+    </div>
+    <div class="sp"></div>
+    ${TAG}<span class="save" id="save" role="status">Salvo · <span class="mono">${ED.saved}</span></span>
+    <a class="btn btn-ghost btn-sm ed-test" href="#testar/${f.id}">${ic('type')}Testar fonte</a>${SLOT}
+  </header>
+  <div class="ed-canvas" id="cv" data-tool="${ED.tool}">
+    <div class="ed-tools" role="toolbar" aria-label="Ferramentas">${TOOLS.map(([k,l,s])=>`<button class="ed-tool" type="button" data-tool="${k}" aria-pressed="${ED.tool===k}" title="${l} (${s})" aria-label="${l}, atalho ${s}">${ic(k)}<kbd aria-hidden="true">${s==='Espaço'?'SP':s}</kbd></button>`).join('')}</div>
+    <svg class="gsvg" id="ed-svg" aria-label="Área de desenho do glifo ${esc(g.name)}" role="img"></svg>
+    <div class="ed-empty" id="ed-empty" hidden><h2>Este glifo ainda não tem desenho</h2><p>Use a Caneta (P): cada clique cria um nó, e clicar no primeiro nó fecha o contorno. Ou arraste com o Retângulo (R) ou a Elipse (E) para começar com uma forma.</p></div>
+    <div class="ed-zoom"><button type="button" id="z-out" aria-label="Afastar">${ic('minus')}</button><span class="mono" id="z-val">100%</span><button type="button" id="z-in" aria-label="Aproximar">${ic('plus')}</button><button type="button" id="z-fit" aria-label="Ajustar o glifo na tela">${ic('fit')}</button></div>
+  </div>
+  <aside class="ed-insp" aria-label="Inspetor">
+    <section class="ins-sec"><h2>Glifo</h2>
+      <label class="fld"><span>Nome</span><input id="in-name" value="${esc(g.name)}" style="font-family:var(--ui)"></label>
+      <label class="fld"><span>Caractere</span><input id="in-ch" value="${esc(g.ch)}" maxlength="2" style="font-family:var(--glyph);font-size:15px"></label>
+      <div class="fld"><span>Código</span><span class="ro">U+${g.cp}</span></div>
+    </section>
+    <section class="ins-sec"><h2>Espaçamento</h2>
+      <label class="fld"><span>Largura</span><input id="in-w" inputmode="numeric"></label>
+      <label class="fld"><span>Margem esquerda</span><input id="in-l" inputmode="numeric"></label>
+      <label class="fld"><span>Margem direita</span><input id="in-r" inputmode="numeric"></label>
+    </section>
+    <section class="ins-sec"><h2 id="sel-h">Nó selecionado</h2>
+      <label class="fld"><span>X</span><input id="in-x" inputmode="numeric"></label>
+      <label class="fld"><span>Y</span><input id="in-y" inputmode="numeric"></label>
+      <div class="seg" role="group" aria-label="Tipo do nó"><button type="button" id="t-corner">Canto</button><button type="button" id="t-smooth">Suave</button></div>
+    </section>
+    <section class="ins-sec"><h2>Contornos</h2><p class="ins-note" id="ct-note"></p></section>
+    <section class="ins-sec"><h2>Atalhos</h2><div class="keys-list">
+      <div><span>Ferramentas</span><kbd>V P R E</kbd></div><div><span>Mover a tela</span><kbd>Espaço</kbd></div>
+      <div><span>Aproximar e afastar</span><kbd>Ctrl + = −</kbd></div><div><span>Ajustar na tela</span><kbd>Ctrl + 0</kbd></div>
+      <div><span>Apagar seleção</span><kbd>Delete</kbd></div><div><span>Desfazer e refazer</span><kbd>Ctrl + Z</kbd></div>
+      <div><span>Glifo anterior e próximo</span><kbd>[ ]</kbd></div></div></section>
+  </aside>
+  <footer class="ed-prev"><span class="pv-label" id="pv-l">Prévia</span><button type="button" class="pv-render" id="pv" aria-labelledby="pv-l pv" title="Clique para editar o texto"></button><span class="pv-size"><span class="mono">48</span> px</span><p class="ed-hint" id="ed-hint" aria-live="polite"></p></footer>`;
+
+  const i=keys.indexOf(g);
+  const nav=d=>{const n=keys[i+d];if(!n)return toast('Não há outro glifo nessa direção.');if(editable(f,n))go(`editor/${f.id}/${encodeURIComponent(n.name)}`);else toast(f.kind==='open'?'Protótipo: só o “a” tem os nós carregados.':`O “${n.ch}” é um símbolo de exemplo e não abre no editor.`);};
+  $('#g-prev').onclick=()=>nav(-1);$('#g-next').onclick=()=>nav(1);
+  ED.nav=nav;
+  $$('.ed-tool',el).forEach(b=>b.onclick=()=>setTool(b.dataset.tool));
+  $('#z-in').onclick=()=>zoomBy(1.25);$('#z-out').onclick=()=>zoomBy(.8);$('#z-fit').onclick=fitView;
+  bindCanvas();bindInspector();bindPreview();
+  setTool(ED.tool);
+  fitView();
+}
+function setTool(t){
+  ED.tool=t;$('#cv').dataset.tool=t;
+  $$('.ed-tool').forEach(b=>b.setAttribute('aria-pressed',String(b.dataset.tool===t)));
+  $('#ed-hint').textContent=HINTS[t];
+  if(t!=='pen') ED.drawing=null;
+  edRender();
+}
+function fitView(){
+  const W=ED.g.width;ED.vb={x:-320,y:-930,w:W+640,h:1260};ED.base={...ED.vb};ED.zoom=1;edRender();
+}
+function zoomBy(z,cx,cy){
+  const v=ED.vb;cx=cx??v.x+v.w/2;cy=cy??v.y+v.h/2;
+  const nz=Math.min(8,Math.max(.25,ED.zoom*z));z=nz/ED.zoom;ED.zoom=nz;
+  ED.vb={x:cx-(cx-v.x)/z,y:cy-(cy-v.y)/z,w:v.w/z,h:v.h/z};edRender();
+}
+function k(){const r=$('#ed-svg').getBoundingClientRect();return 1/(Math.min(r.width/ED.vb.w,r.height/ED.vb.h)||1);}
+function toFont(e){const svg=$('#ed-svg'),p=svg.createSVGPoint();p.x=e.clientX;p.y=e.clientY;const q=p.matrixTransform(svg.getScreenCTM().inverse());return {x:Math.round(q.x),y:Math.round(-q.y)};}
+function attached(c,i){const p=c.pts,n=p.length,pr=p[(i-1+n)%n];return (c.closed||i>0)&&pr.t!=='off'?(i-1+n)%n:(i+1)%n;}
+function edRender(){
+  const svg=$('#ed-svg'); if(!svg||!ED.vb) return;
+  const {x,y,w,h}=ED.vb,K=k(),W=ED.g.width,g=ED.g;
+  svg.setAttribute('viewBox',`${x} ${y} ${w} ${h}`);
+  let o='<defs><pattern id="ed-dots" width="24" height="24" patternUnits="userSpaceOnUse"><circle cx="12" cy="12" r="2.3" fill="#C9C7C4"/></pattern></defs>';
+  const X1=x-w*2,X2=x+w*3,Y1=y-h*2,Y2=y+h*3;
+  if(!g.contours.length) o+=`<rect x="0" y="-800" width="${W}" height="1000" fill="url(#ed-dots)"/>`;
+  for(const [my,l] of METRICS){
+    o+=`<line class="ml${my===0?' base':''}" x1="${X1}" x2="${X2}" y1="${-my}" y2="${-my}"/>`;
+    o+=`<text class="lab" x="${-16*K}" y="${-my-6*K}" text-anchor="end" font-size="${11*K}">${METRICS.find(m=>m[0]===my)[1]}</text><text class="val" x="${W+16*K}" y="${-my-6*K}" font-size="${10.5*K}">${num(my)}</text>`;
+  }
+  o+=`<line class="sb" x1="0" x2="0" y1="${Y1}" y2="${Y2}"/><line class="sb" x1="${W}" x2="${W}" y1="${Y1}" y2="${Y2}"/>`;
+  const nn=g.contours.reduce((a,c)=>a+c.pts.filter(p=>p.t!=='off').length,0);
+  o+=`<text class="lab" x="${W/2}" y="${200+34*K}" text-anchor="middle" font-size="${11*K}" font-weight="400">${esc(g.ch)} · <tspan class="val">U+${g.cp}</tspan> · ${esc(ED.f.name)} · largura <tspan class="val">${W}</tspan> · <tspan class="val">${nn}</tspan> ${nn===1?'nó':'nós'}</text>`;
+  for(const [rx,ry,sx,sy] of [[0,800,-1,-1],[W,800,1,-1],[0,-200,-1,1],[W,-200,1,1]]){
+    const cx=rx+sx*30*K,cy=-ry+sy*30*K;
+    o+=`<g class="rg"><circle cx="${cx}" cy="${cy}" r="${6.5*K}"/><line x1="${cx-13*K}" x2="${cx+13*K}" y1="${cy}" y2="${cy}"/><line x1="${cx}" x2="${cx}" y1="${cy-13*K}" y2="${cy+13*K}"/></g>`;
+  }
+  o+=`<path class="gp" id="ed-path" fill-rule="evenodd" d="${closedD(g.contours)}"/>`;
+  g.contours.filter(c=>!c.closed).forEach(c=>o+=`<path class="op" d="${contourD(c)}"/>`);
+  if(ED.draft) o+=`<path class="draft" d="${contourD(ED.draft)}"/>`;
+  let hs='',ns='';
+  g.contours.forEach((c,ci)=>{const n=c.pts.length;c.pts.forEach((q,pi)=>{
+    const sel=ED.sel&&ED.sel.c===ci&&ED.sel.i===pi;
+    if(q.t==='off'){const a=c.pts[attached(c,pi)];hs+=`<line class="hl" x1="${a.x}" y1="${-a.y}" x2="${q.x}" y2="${-q.y}"/><circle class="hd${sel?' sel':''}" data-c="${ci}" data-i="${pi}" cx="${q.x}" cy="${-q.y}" r="${(sel?4.5:3.4)*K}"/>`;}
+    else{const first=!c.closed&&pi===0&&ED.tool==='pen';const r=(sel?6:4.8)*K,sq=(sel?11:9)*K;
+      ns+= q.s?`<circle class="nd${sel?' sel':''}${first?' first':''}" data-c="${ci}" data-i="${pi}" cx="${q.x}" cy="${-q.y}" r="${r}"/>`
+              :`<rect class="nd${sel?' sel':''}${first?' first':''}" data-c="${ci}" data-i="${pi}" x="${q.x-sq/2}" y="${-q.y-sq/2}" width="${sq}" height="${sq}"/>`;}
+  });});
+  o+=hs+ns;
+  if(ED.sel){const q=g.contours[ED.sel.c]?.pts[ED.sel.i];if(q){const t=`${q.x}, ${q.y}`,tw=(t.length*6.9+18)*K;
+    o+=`<g class="tip" transform="translate(${q.x+14*K} ${-q.y-16*K})"><rect x="0" y="${-18*K}" width="${tw}" height="${24*K}"/><text x="${9*K}" y="${-1.5*K}" font-size="${11*K}">${t}</text></g>`;}}
+  svg.innerHTML=o;
+  $('#ed-empty').hidden=g.contours.length>0||!!ED.draft;
+  $('#z-val').textContent=Math.round(ED.zoom*100)+'%';
+  syncInspector();renderPreview();
+}
+function bbox(){const p=$('#ed-path');if(!p||!ED.g.contours.some(c=>c.closed))return null;const b=p.getBBox();return {l:Math.round(b.x),r:Math.round(b.x+b.width)};}
+function syncInspector(){
+  const g=ED.g,b=bbox(),set=(id,v)=>{const i=$('#'+id);if(i&&document.activeElement!==i)i.value=v;};
+  set('in-w',g.width);set('in-l',b?b.l:'—');set('in-r',b?g.width-b.r:'—');
+  $('#in-l').disabled=$('#in-r').disabled=!b;
+  const q=ED.sel&&g.contours[ED.sel.c]?.pts[ED.sel.i];
+  $('#sel-h').textContent=!q?'Nada selecionado':q.t==='off'?'Alça selecionada':'Nó selecionado';
+  set('in-x',q?q.x:'—');set('in-y',q?q.y:'—');
+  $('#in-x').disabled=$('#in-y').disabled=!q;
+  const isNode=q&&q.t!=='off';
+  $('#t-corner').disabled=$('#t-smooth').disabled=!isNode;
+  $('#t-corner').setAttribute('aria-pressed',String(!!(isNode&&!q.s)));$('#t-smooth').setAttribute('aria-pressed',String(!!(isNode&&q.s)));
+  const cl=g.contours.filter(c=>c.closed).length,op=g.contours.length-cl,nodes=g.contours.reduce((a,c)=>a+c.pts.filter(p=>p.t!=='off').length,0);
+  const note=$('#ct-note');
+  note.className='ins-note'+(op?' warn':'');
+  note.textContent=!g.contours.length?'Nenhum contorno ainda.':`${cl} ${cl===1?'contorno fechado':'contornos fechados'}${op?` · ${op} aberto${op>1?'s':''}, fica fora da exportação`:''} · ${nodes} ${nodes===1?'nó':'nós'}`;
+}
+function snapshot(){ED.hist.push(JSON.stringify({c:ED.g.contours,w:ED.g.width}));if(ED.hist.length>80)ED.hist.shift();ED.fut=[];}
+function restore(from,to){if(!from.length)return;to.push(JSON.stringify({c:ED.g.contours,w:ED.g.width}));const s=JSON.parse(from.pop());ED.g.contours=s.c;ED.g.width=s.w;ED.sel=null;ED.g.drawn=s.c.some(c=>c.closed);edRender();dirty();}
+function dirty(){
+  ED.g.drawn = ED.f.kind==='open' ? true : ED.g.contours.some(c=>c.closed);
+  const s=$('#save');s.textContent='Salvando…';s.classList.add('busy');
+  clearTimeout(ED.saveT);ED.saveT=setTimeout(()=>{ED.saved=hhmm();s.innerHTML='Salvo · <span class="mono">'+ED.saved+'</span>';s.classList.remove('busy');},900);
+}
+function moveNode(c,i,nx,ny){
+  const p=c.pts,n=p.length,q=p[i];
+  if(q.t==='off'){
+    q.x=nx;q.y=ny;
+    const ai=attached(c,i),a=p[ai];
+    if(a.s){const oi=ai===(i-1+n)%n?(ai-1+n)%n:(ai+1)%n,o=p[oi];
+      if(o&&o!==q&&o.t==='off'&&(c.closed||(oi>=0&&oi<n))){const dx=q.x-a.x,dy=q.y-a.y,L=Math.hypot(dx,dy)||1,ol=Math.hypot(o.x-a.x,o.y-a.y);o.x=Math.round(a.x-dx/L*ol);o.y=Math.round(a.y-dy/L*ol);}}
+    return;
+  }
+  const dx=nx-q.x,dy=ny-q.y;q.x=nx;q.y=ny;
+  for(const j of [i-1,i+1]){if(!c.closed&&(j<0||j>=n))continue;const r=p[(j+n)%n];if(r.t==='off'&&attached(c,(j+n)%n)===i){r.x+=dx;r.y+=dy;}}
+}
+function bindCanvas(){
+  const cv=$('#cv'),svg=$('#ed-svg');
+  svg.addEventListener('pointerdown',e=>{
+    if(e.button!==0) return;
+    svg.setPointerCapture(e.pointerId);
+    const pt=toFont(e),tgt=e.target.closest('[data-c]');
+    if(ED.tool==='hand'||ED.space){ED.pan={x:e.clientX,y:e.clientY,vb:{...ED.vb}};cv.classList.add('panning');return;}
+    if(ED.tool==='select'){
+      if(tgt){ED.sel={c:+tgt.dataset.c,i:+tgt.dataset.i};snapshot();ED.drag={moved:false};}
+      else ED.sel=null;
+      edRender();return;
+    }
+    if(ED.tool==='pen'){
+      const g=ED.g;
+      if(ED.drawing!=null&&g.contours[ED.drawing]){
+        const c=g.contours[ED.drawing],f0=c.pts[0],K=k();
+        if(c.pts.length>=2&&Math.hypot(f0.x-pt.x,f0.y-pt.y)<10*K){snapshot();c.closed=true;ED.drawing=null;ED.sel={c:g.contours.indexOf(c),i:0};edRender();dirty();toast('Contorno fechado.');return;}
+        snapshot();c.pts.push({x:pt.x,y:pt.y,t:'line',s:false});ED.sel={c:ED.drawing,i:c.pts.length-1};
+      } else {snapshot();g.contours.push({closed:false,pts:[{x:pt.x,y:pt.y,t:'line',s:false}]});ED.drawing=g.contours.length-1;ED.sel={c:ED.drawing,i:0};}
+      edRender();dirty();return;
+    }
+    if(ED.tool==='rect'||ED.tool==='ellipse'){ED.shape={x0:pt.x,y0:pt.y};ED.draft=null;}
+  });
+  svg.addEventListener('pointermove',e=>{
+    if(ED.pan){const K=k();ED.vb.x=ED.pan.vb.x-(e.clientX-ED.pan.x)*K;ED.vb.y=ED.pan.vb.y-(e.clientY-ED.pan.y)*K;edRender();return;}
+    if(ED.drag&&ED.sel){const pt=toFont(e),c=ED.g.contours[ED.sel.c];moveNode(c,ED.sel.i,pt.x,pt.y);ED.drag.moved=true;edRender();return;}
+    if(ED.shape){const pt=toFont(e);ED.draft=shapeContour(ED.tool,ED.shape.x0,ED.shape.y0,pt.x,pt.y);edRender();}
+  });
+  const up=()=>{
+    if(ED.pan){ED.pan=null;cv.classList.remove('panning');}
+    if(ED.drag){if(ED.drag.moved)dirty();else ED.hist.pop();ED.drag=null;}
+    if(ED.shape){if(ED.draft&&ED.draft.ok){snapshot();ED.g.contours.push({closed:true,pts:ED.draft.pts});ED.sel=null;dirty();setTool('select');}ED.shape=null;ED.draft=null;edRender();}
+  };
+  svg.addEventListener('pointerup',up);svg.addEventListener('pointercancel',up);
+  svg.addEventListener('dblclick',e=>{const t=e.target.closest('[data-c]');if(!t)return;const q=ED.g.contours[+t.dataset.c].pts[+t.dataset.i];if(q.t!=='off'){snapshot();q.s=!q.s;edRender();dirty();}});
+  svg.addEventListener('wheel',e=>{if(!(e.ctrlKey||e.metaKey))return;e.preventDefault();const p=toFont(e);zoomBy(e.deltaY<0?1.1:.9,p.x,-p.y);},{passive:false});
+  new ResizeObserver(()=>edRender()).observe(cv);
+}
+function shapeContour(t,x0,y0,x1,y1){
+  const l=Math.min(x0,x1),r=Math.max(x0,x1),b=Math.min(y0,y1),tp=Math.max(y0,y1),ok=r-l>4&&tp-b>4;
+  if(t==='rect') return {closed:true,ok,pts:[{x:l,y:b,t:'line'},{x:r,y:b,t:'line'},{x:r,y:tp,t:'line'},{x:l,y:tp,t:'line'}].map(p=>({...p,s:false}))};
+  const cx=Math.round((l+r)/2),cy=Math.round((b+tp)/2),rx=(r-l)/2,ry=(tp-b)/2,K=.5523,R=Math.round;
+  return {closed:true,ok,pts:[
+    {x:R(cx+rx),y:cy,t:'curve',s:true},{x:R(cx+rx),y:R(cy+K*ry),t:'off'},{x:R(cx+K*rx),y:R(cy+ry),t:'off'},
+    {x:cx,y:R(cy+ry),t:'curve',s:true},{x:R(cx-K*rx),y:R(cy+ry),t:'off'},{x:R(cx-rx),y:R(cy+K*ry),t:'off'},
+    {x:R(cx-rx),y:cy,t:'curve',s:true},{x:R(cx-rx),y:R(cy-K*ry),t:'off'},{x:R(cx-K*rx),y:R(cy-ry),t:'off'},
+    {x:cx,y:R(cy-ry),t:'curve',s:true},{x:R(cx+K*rx),y:R(cy-ry),t:'off'},{x:R(cx+rx),y:R(cy-K*ry),t:'off'}]};
+}
+function bindInspector(){
+  const nv=v=>{const n=parseInt(String(v).replace('−','-'),10);return Number.isFinite(n)?Math.max(-2000,Math.min(3000,n)):null;};
+  $('#in-x').onchange=$('#in-y').onchange=()=>{const q=ED.sel&&ED.g.contours[ED.sel.c].pts[ED.sel.i];const x=nv($('#in-x').value),y=nv($('#in-y').value);if(!q||x==null||y==null)return edRender();snapshot();moveNode(ED.g.contours[ED.sel.c],ED.sel.i,x,y);edRender();dirty();};
+  $('#in-w').onchange=()=>{const w=nv($('#in-w').value);if(w==null||w<0)return edRender();snapshot();ED.g.width=w;edRender();dirty();};
+  const shift=d=>{for(const c of ED.g.contours)for(const p of c.pts)p.x+=d;};
+  $('#in-l').onchange=()=>{const b=bbox(),v=nv($('#in-l').value);if(!b||v==null)return edRender();snapshot();const d=v-b.l;shift(d);ED.g.width+=d;edRender();dirty();};
+  $('#in-r').onchange=()=>{const b=bbox(),v=nv($('#in-r').value);if(!b||v==null)return edRender();snapshot();ED.g.width=b.r+v;edRender();dirty();};
+  $('#t-corner').onclick=()=>setSmooth(false);$('#t-smooth').onclick=()=>setSmooth(true);
+  $('#in-name').onchange=()=>{toast('Protótipo: o nome do glifo não muda neste exemplo.');$('#in-name').value=ED.g.name;};
+  $('#in-ch').onchange=()=>{toast('Protótipo: o caractere não muda neste exemplo.');$('#in-ch').value=ED.g.ch;};
+}
+function setSmooth(v){const q=ED.sel&&ED.g.contours[ED.sel.c].pts[ED.sel.i];if(!q||q.t==='off')return;snapshot();q.s=v;edRender();dirty();}
+function previewHTML(f,text,cur){
+  return [...text].map(ch=>{
+    const g=f.glyphs.find(x=>x.ch===ch);
+    if(ch===' ') return ' ';
+    const isCur=cur&&ch===cur.ch;
+    if(g){const inl=glyphInline(g);if(inl)return isCur?`<span class="cur">${inl}</span>`:inl;
+      if(g.drawn)return isCur?`<span class="cur">${esc(ch)}</span>`:esc(ch);}
+    if(f.kind!=='open'&&/\p{L}/u.test(ch)) return `<span class="tofu" title="Sem desenho"></span>`;
+    return `<span style="color:var(--ink-2)">${esc(ch)}</span>`;
+  }).join('');
+}
+function renderPreview(){const pv=$('#pv');if(pv&&pv.tagName==='BUTTON'){pv.innerHTML=previewHTML(ED.f,ED.preview,ED.g);pv.style.fontWeight=ED.f.weight||400;}}
+function bindPreview(){
+  $('.ed-prev').addEventListener('click',e=>{
+    const pv=e.target.closest('#pv');if(!pv)return;
+    const inp=document.createElement('input');inp.className='pv-input';inp.id='pv';inp.value=ED.preview;inp.setAttribute('aria-label','Texto da prévia');inp.style.fontWeight=ED.f.weight||400;
+    pv.replaceWith(inp);inp.focus();
+    const done=()=>{ED.preview=inp.value||ED.preview;const b=document.createElement('button');b.type='button';b.className='pv-render';b.id='pv';b.title='Clique para editar o texto';b.setAttribute('aria-labelledby','pv-l pv');inp.replaceWith(b);renderPreview();};
+    inp.onblur=done;inp.onkeydown=ev=>{if(ev.key==='Enter'||ev.key==='Escape'){ev.preventDefault();inp.blur();}};
+  });
+}
+document.addEventListener('keydown',e=>{
+  if($('#s-editor').hidden||document.querySelector('dialog[open]')) return;
+  const tag=(e.target.tagName||'').toLowerCase();
+  if(tag==='input'||tag==='textarea') return;
+  const mod=e.ctrlKey||e.metaKey;
+  if(mod&&(e.key==='='||e.key==='+')){e.preventDefault();zoomBy(1.25);return;}
+  if(mod&&e.key==='-'){e.preventDefault();zoomBy(.8);return;}
+  if(mod&&e.key==='0'){e.preventDefault();fitView();return;}
+  if(mod&&e.key.toLowerCase()==='z'){e.preventDefault();e.shiftKey?restore(ED.fut,ED.hist):restore(ED.hist,ED.fut);return;}
+  if(mod&&e.key.toLowerCase()==='s'){e.preventDefault();dirty();return;}
+  if(mod) return;
+  if(e.key===' '){if(!ED.space){ED.space=true;$('#cv').dataset.tool='hand';}e.preventDefault();return;}
+  const map={v:'select',p:'pen',r:'rect',e:'ellipse'};
+  if(map[e.key.toLowerCase()]){setTool(map[e.key.toLowerCase()]);return;}
+  if(e.key==='['){ED.nav(-1);return;} if(e.key===']'){ED.nav(1);return;}
+  if(e.key==='Escape'){if(ED.drawing!=null){ED.drawing=null;edRender();toast('Contorno aberto: ele fica fora da exportação até ser fechado.');}else{ED.sel=null;edRender();}return;}
+  if(ED.sel&&e.key.startsWith('Arrow')){
+    e.preventDefault();const d=e.shiftKey?10:1,c=ED.g.contours[ED.sel.c],q=c.pts[ED.sel.i];
+    const dx=e.key==='ArrowLeft'?-d:e.key==='ArrowRight'?d:0,dy=e.key==='ArrowUp'?d:e.key==='ArrowDown'?-d:0;
+    snapshot();moveNode(c,ED.sel.i,q.x+dx,q.y+dy);edRender();dirty();return;
+  }
+  if(ED.sel&&(e.key==='Delete'||e.key==='Backspace')){
+    e.preventDefault();snapshot();const c=ED.g.contours[ED.sel.c],n=c.pts.length,i=ED.sel.i;
+    if(c.pts[i].t==='off'){c.pts.splice(i,1);const pair=c.pts.findIndex((p,j)=>p.t==='off'&&(j===i-1||j===i));if(pair>=0)c.pts.splice(pair,1);c.pts.forEach(p=>{if(p.t==='curve'&&!c.pts.some(o=>o.t==='off'))p.t='line';});}
+    else{const rm=new Set([i]);for(const j of [i-1,i+1]){const jj=(j+n)%n;if(c.pts[jj]&&c.pts[jj].t==='off')rm.add(jj);}c.pts=c.pts.filter((_,j)=>!rm.has(j));
+      c.pts.forEach((p,j)=>{if(p.t==='curve'){const a=c.pts[(j-1+c.pts.length)%c.pts.length],b=c.pts[(j-2+c.pts.length)%c.pts.length];if(!(a&&a.t==='off'&&b&&b.t==='off'))p.t='line';}});
+      c.pts=c.pts.filter((p,j,arr)=>p.t!=='off'||(arr[(j-1+arr.length)%arr.length].t==='off'||arr[(j+1)%arr.length].t==='off'));}
+    if(c.pts.filter(p=>p.t!=='off').length<(c.closed?2:1))ED.g.contours.splice(ED.sel.c,1);
+    if(ED.drawing!=null&&!ED.g.contours[ED.drawing])ED.drawing=null;
+    ED.sel=null;edRender();dirty();
+  }
+});
+document.addEventListener('keyup',e=>{if(e.key===' '&&ED.space){ED.space=false;const cv=$('#cv');if(cv)cv.dataset.tool=ED.tool;}});
+
+/* =========================================================
+   T6 · Testar fonte
+   ========================================================= */
+const PANGRAMA='Um pequeno jabuti xereta viu dez cegonhas felizes.';
+function renderTestar(id){
+  const f=getFont(id); if(!f){go('fontes');return;}
+  const st=fontStats(f),fict=f.kind!=='open';
+  const has=s=>f.kind==='open'&&f.scripts.includes(s);
+  const alpha=fict?'abcdefghijklmnopqrstuvwxyz':['ABCDEFGHIJKLMNOPQRSTUVWXYZ\nabcdefghijklmnopqrstuvwxyz\n0123456789',has('grego')?'ΑΒΓΔΕΖΗΘ αβγδεζηθ':'',has('cirilico')?'АБВГДЕЖЗ абвгдежз':''].filter(Boolean).join('\n');
+  const presets=[['alfabeto','Alfabeto completo',alpha],['pangrama','Pangrama',fict?PANGRAMA.toLowerCase():PANGRAMA],['ola','Olá, mundo',fict?'olá, mundo':'Olá, mundo']];
+  const start=fict?'bem-vindo, viajante':PANGRAMA;
+  const ready=st.empty===0&&st.open===0&&st.total>1;
+  const missing=f.glyphs.filter(g=>!g.drawn&&g.script!=='outros');
+  const el=$('#s-testar');
+  el.innerHTML=`<header class="appbar">${BRAND}<nav class="crumbs" aria-label="Você está em"><a href="#fontes">Minhas fontes</a><span aria-hidden="true">/</span><a href="#fonte/${f.id}">${esc(f.name)}</a><span aria-hidden="true">/</span><b>Testar fonte</b></nav><div class="sp"></div>${TAG}<span class="who">${esc(state.email)}</span>${SLOT}<a class="btn btn-ghost btn-sm" href="#entrar">Sair</a></header>
+  <main class="page" id="main">
+    <div class="page-head"><div><h1 tabindex="-1">Testar ${esc(f.name)}</h1><p class="meta">Fonte gerada agora a partir dos desenhos. É a mesma que vai na exportação.</p></div>
+      <button class="btn btn-primary" type="button" data-export="${f.id}">${ic('download')}Exportar .otf</button></div>
+    <div class="tt${ready?' sealed':''}">
+      <div>
+        <div class="tt-controls">
+          <div class="presets" role="group" aria-label="Textos prontos">${presets.map(([k,l])=>`<button type="button" data-p="${k}" aria-pressed="false">${l}</button>`).join('')}</div>
+          <label class="size">Tamanho <input type="range" id="sz" min="12" max="200" value="72" aria-valuetext="72 pixels"><output class="mono" id="sz-v" for="sz">72 px</output></label>
+        </div>
+        <div class="tt-plate reg">${ticks()}${ready?stampSVG(st.total):''}<div class="tt-box${fict?' fict':''}" id="tt-box">
+          <div class="tt-render" id="tt-r" aria-hidden="true"></div>
+          <textarea class="tt-ta" id="tt" spellcheck="false" aria-label="Texto de teste. Digite para ver com a fonte ${esc(f.name)}">${esc(start)}</textarea>
+        </div></div>
+        <p class="tt-cap"><span>${esc(f.name)} · ${mn(st.total+' glifos')}</span><span>${fict?'teclas sem desenho aparecem como quadros pontilhados':'digite em português, grego ou russo'}</span></p>
+      </div>
+      <aside class="tt-aside" aria-label="Exportação">
+        <section><h2>Antes de exportar</h2>
+          ${ready?`<div class="ready"><p>Nenhum glifo ficou de fora. Os ${mn(String(st.total))} glifos entram no arquivo, e o selo da prancha confirma.</p></div>`
+            :`<div class="pending reg">${ticks()}<b>${ic('alert')}${missing.length} ${missing.length===1?'tecla fica':'teclas ficam'} fora do arquivo</b><p>Elas ainda não têm desenho. Clique numa tecla para desenhá-la.</p>
+              <div class="missing">${missing.map(g=>`<a href="#editor/${f.id}/${encodeURIComponent(g.name)}" aria-label="Desenhar ${esc(g.name)}">${esc(g.ch)}</a>`).join('')}</div></div>`}
+          ${st.open?`<p class="ins-note warn" style="margin-top:12px">${st.open} ${st.open===1?'glifo tem':'glifos têm'} contorno aberto e fica${st.open===1?'':'m'} de fora.</p>`:''}
+        </section>
+        <section><h2>O arquivo</h2><div class="credits">
+          <div class="row"><span>Família</span><span class="ro" style="font-family:var(--ui)">${esc(f.name)}</span></div>
+          <div class="row"><span>Formato</span><span class="ro">.otf</span></div>
+          <div class="row"><span>Unidades por em</span><span class="ro">1000</span></div>
+          <div class="row"><span>Licença</span><span class="ro">${f.kind==='open'?'OFL 1.1':'—'}</span></div>
+        </div></section>
+      </aside>
+    </div>
+  </main>`;
+  const ta=$('#tt'),rd=$('#tt-r'),box=$('#tt-box');
+  ta.style.fontWeight=rd.style.fontWeight=f.weight||400;
+  const draw=()=>{if(fict)rd.innerHTML=renderFict(f,ta.value)+'\n';};
+  const setSize=v=>{box.querySelectorAll('.tt-ta,.tt-render').forEach(n=>n.style.fontSize=v+'px');$('#sz-v').textContent=v+' px';$('#sz').setAttribute('aria-valuetext',v+' pixels');};
+  ta.addEventListener('input',()=>{draw();$$('[data-p]',el).forEach(b=>b.setAttribute('aria-pressed','false'));});
+  ta.addEventListener('scroll',()=>{rd.scrollTop=ta.scrollTop;});
+  $('#sz').addEventListener('input',e=>setSize(e.target.value));
+  $$('[data-p]',el).forEach(b=>b.onclick=()=>{ta.value=presets.find(p=>p[0]===b.dataset.p)[2];$$('[data-p]',el).forEach(x=>x.setAttribute('aria-pressed',String(x===b)));draw();});
+  const sp=presets.find(p=>p[2]===start);if(sp)$(`[data-p="${sp[0]}"]`,el).setAttribute('aria-pressed','true');
+  const v0=innerWidth<640?40:72;$('#sz').value=v0;setSize(v0);draw();
+}
+function renderFict(f,text){
+  return text.split(/(\s+)/).map(part=>/^\s*$/.test(part)?part:`<span style="white-space:nowrap">${fictChars(f,part)}</span>`).join('');
+}
+function fictChars(f,text){
+  return [...text].map(ch=>{
+    if(ch==='\n'||ch===' ') return ch;
+    const g=f.glyphs.find(x=>x.ch===ch);
+    if(g&&g.sym) return `<span class="eg"><svg viewBox="0 -4 100 108" aria-hidden="true"><g class="fx" style="stroke-width:9">${g.sym}</g></svg></span>`;
+    if(g&&g.contours&&g.contours.some(c=>c.closed)) return `<span class="eg"><svg viewBox="0 -800 ${g.width} 1000" preserveAspectRatio="xMidYMid meet" aria-hidden="true"><path fill-rule="evenodd" fill="#16181A" d="${closedD(g.contours)}"/></svg></span>`;
+    if(/\p{L}/u.test(ch)) return '<span class="tf"></span>';
+    return `<span class="fb">${esc(ch)}</span>`;
+  }).join('');
+}
+document.addEventListener('click',e=>{
+  const b=e.target.closest('[data-export]');if(!b)return;
+  const f=getFont(b.dataset.export),st=fontStats(f);
+  toast(st.empty?`Protótipo: “${f.name}.otf” seria baixado, sem as ${st.empty} teclas que ainda não têm desenho.`:`Protótipo: o arquivo “${f.name}.otf” seria baixado agora.`);
+});
+
+/* =========================================================
+   T1 · Entrar e criar conta
+   ========================================================= */
+let authMode='in';
+function setAuth(m){
+  authMode=m;
+  $('#tab-in').setAttribute('aria-selected',String(m==='in'));$('#tab-up').setAttribute('aria-selected',String(m==='up'));
+  $('#tab-in').tabIndex=m==='in'?0:-1;$('#tab-up').tabIndex=m==='up'?0:-1;
+  $('#auth-form').setAttribute('aria-labelledby',m==='in'?'tab-in':'tab-up');
+  $('#auth-go').textContent=m==='in'?'Entrar':'Criar conta';
+  $('#pass-hint').hidden=m==='in';
+  $('#pass').autocomplete=m==='in'?'current-password':'new-password';
+  $('#auth-err').classList.remove('on');$$('#auth-form .field').forEach(f=>f.classList.remove('err'));
+}
+$('#tab-in').onclick=()=>setAuth('in');$('#tab-up').onclick=()=>setAuth('up');
+$('.tabs').addEventListener('keydown',e=>{if(e.key==='ArrowRight'||e.key==='ArrowLeft'){const m=authMode==='in'?'up':'in';setAuth(m);$(m==='in'?'#tab-in':'#tab-up').focus();}});
+$('#auth-form').addEventListener('submit',e=>{
+  e.preventDefault();
+  const em=$('#email').value.trim(),pw=$('#pass').value;let bad=null;
+  $('#auth-err').classList.remove('on');
+  const okEmail=/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(em);
+  $('#f-email').classList.toggle('err',!okEmail);
+  const pwBad=authMode==='up'?pw.length<8:!pw;
+  $('#pass-err span').textContent=authMode==='up'?'A senha precisa ter pelo menos 8 caracteres.':'Informe a senha.';
+  $('#f-pass').classList.toggle('err',pwBad);
+  if(!okEmail)bad=$('#email');else if(pwBad)bad=$('#pass');
+  if(bad){bad.focus();return;}
+  if(authMode==='in'&&em.toLowerCase()==='erro@exemplo.com'){$('#auth-err').classList.add('on');$('#pass').value='';$('#pass').focus();return;}
+  state.email=em.toLowerCase();go('fontes');
+});
+['email','pass'].forEach(id=>$('#'+id).addEventListener('input',()=>$('#'+id).closest('.field').classList.remove('err')));
+
+/* =========================================================
+   navegação entre telas
+   ========================================================= */
+const TITLES={entrar:'Entrar',fontes:'Minhas fontes',fonte:'Visão da fonte',editor:'Editor de glifo',testar:'Testar fonte'};
+let curRoute='';
+function go(h){
+  try{history.pushState(null,'','#'+h);}catch(err){}
+  route(h);
+}
+function route(h){
+  if(typeof h!=='string') h=location.hash.slice(1);
+  curRoute=h.split('/')[0]||'entrar';
+  closeMenus();
+  const parts=(h||'entrar').split('/').map(decodeURIComponent);
+  let [name,a,b]=parts;
+  if(name!=='nova'&&$('#dlg-nova').open) $('#dlg-nova').close();
+  if(name==='nova'){showScreen('fontes');renderFontes();placeProto();openNova();document.title='Nova fonte · Grafiaa';return;}
+  if(!TITLES[name]) name='entrar';
+  showScreen(name);
+  if(name==='entrar'){setAuth(authMode);requestAnimationFrame(()=>staticGlyph($('#auth-svg')));}
+  if(name==='fontes') renderFontes();
+  if(name==='fonte') renderFonte(a||'ana');
+  if(name==='editor') renderEditor(a||'ana',b||'a');
+  if(name==='testar') renderTestar(a||'ana');
+  document.title=`${TITLES[name]} · Grafiaa`;
+  placeProto();
+  const h1=$(`#s-${name} h1`);if(h1&&name!=='entrar'){h1.setAttribute('tabindex','-1');h1.focus({preventScroll:true});}
+  scrollTo(0,0);
+}
+function showScreen(n){$$('.screen').forEach(s=>s.hidden=s.id!=='s-'+n);}
+function parkProto(){const n=$('#proto');if(n&&n.parentNode!==document.body)document.body.appendChild(n);}
+for(const fn of ['renderFontes','renderFonte','renderEditor','renderTestar']){const orig=window[fn];window[fn]=function(...args){parkProto();const r=orig.apply(this,args);placeProto();return r;};}
+function placeProto(){const slot=$('.screen:not([hidden]) .proto-slot'),nav=$('#proto');if(slot&&nav.parentNode!==slot)slot.appendChild(nav);$('#proto-menu').hidden=true;$('#proto-btn').setAttribute('aria-expanded','false');}
+addEventListener('popstate',()=>route());
+document.addEventListener('click',e=>{
+  const a=e.target.closest('a[href^="#"]');
+  if(!a||e.defaultPrevented||e.metaKey||e.ctrlKey||e.shiftKey) return;
+  e.preventDefault();go(a.getAttribute('href').slice(1));
+});
+addEventListener('resize',()=>{if(!$('#s-entrar').hidden)staticGlyph($('#auth-svg'));});
+document.addEventListener('click',e=>{if(!e.target.closest('.menu')&&!e.target.closest('[aria-haspopup]'))closeMenus();});
+$('#proto-btn').onclick=e=>{const m=$('#proto-menu'),o=m.hidden;m.hidden=!o;e.currentTarget.setAttribute('aria-expanded',String(o));};
+$('#proto-menu').addEventListener('click',e=>{if(e.target.closest('a')){$('#proto-menu').hidden=true;$('#proto-btn').setAttribute('aria-expanded','false');}});
+document.fonts.ready.then(()=>{
+  if(!$('#s-entrar').hidden)staticGlyph($('#auth-svg'));
+  const cx=document.createElement('canvas').getContext('2d');cx.font="100px 'Fragment Mono'";
+  document.documentElement.style.setProperty('--adv',(cx.measureText('M').width/100).toFixed(4)+'em');
+});
+route();
+</script>
+</body>
+</html>
