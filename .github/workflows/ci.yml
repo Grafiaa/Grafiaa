@@ -18,3 +18,16 @@ jobs:
       - run: npm run typecheck
       - run: npm test
       - run: npm run build
+
+  publicar:
+    name: Publicar
+    needs: build-e-testes
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    environment:
+      name: production
+      url: https://grafiaa.onrender.com
+    steps:
+      - run: curl -fsS -X POST "$RENDER_DEPLOY_HOOK_URL"
+        env:
+          RENDER_DEPLOY_HOOK_URL: ${{ secrets.RENDER_DEPLOY_HOOK_URL }}
