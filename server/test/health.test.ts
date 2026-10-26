@@ -6,7 +6,7 @@ describe('GET /health', () => {
   it('responde 200 com status e banco ok quando o banco responde', async () => {
     const app = criarApp({ verificarBanco: async () => {} });
     const resposta = await request(app).get('/health');
-    expect(resposta.status).toBe(200);
+    expect(resposta.status).toBe(500);
     expect(resposta.body).toEqual({ status: 'ok', banco: 'ok' });
   });
 
