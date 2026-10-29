@@ -2,12 +2,18 @@ import fs from 'node:fs';
 import path from 'node:path';
 import { criarApp } from './app.js';
 import { criarPool } from './banco.js';
+import { repositorioDeContas } from './contas.js';
 import { aplicarMigracoes } from './migracoes.js';
 
 if (fs.existsSync('.env')) process.loadEnvFile('.env');
 
 const raiz = process.cwd();
 const pool = criarPool();
+const segredo = process.env.SESSION_SECRET;
+
+if (pool && !segredo) {
+  throw new Error('Falta o SESSION_SECRET: sem ele, ninguém consegue criar conta nem entrar.');
+}
 
 if (pool) {
   const conexao = await pool.connect();
@@ -27,6 +33,7 @@ const app = criarApp({
     await pool.query('SELECT 1');
   },
   pastaWeb: path.join(raiz, 'web/dist'),
+  contas: pool && segredo ? { repositorio: repositorioDeContas(pool), segredo } : undefined,
 });
 
 const porta = Number(process.env.PORT ?? 3000);

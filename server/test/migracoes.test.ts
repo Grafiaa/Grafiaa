@@ -61,4 +61,9 @@ describe('aplicarMigracoes', () => {
       expect(sql).toContain(`CREATE TABLE ${tabela} (`);
     }
   });
+
+  it('a migração 002 cria a tabela sessoes', async () => {
+    const sql = await fs.readFile(new URL('../migracoes/002_sessoes.sql', import.meta.url), 'utf8');
+    expect(sql).toContain('CREATE TABLE sessoes (');
+  });
 });
