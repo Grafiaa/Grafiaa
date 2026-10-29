@@ -53,3 +53,24 @@ Feita por escrito, sem reunião.
 - Fazer a planning do Sprint 1 por escrito no docs/sprints.md, com a meta e as features escolhidas. (Stela)
 - No começo de cada sprint, a Stela me mandar o que vou fazer naquele sprint, para eu me preparar antes. (Geovana)
 - Escrever os cenários de teste de cada feature antes de a Stela começar a programar. (Geovana e Stela)
+
+## Sprint 1 · Entrar e ver minhas fontes
+
+- **Período:** 30/10/2026 a 05/11/2026
+- **Meta:** a pessoa cria a conta, entra, vê as fontes dela e cria, renomeia e exclui uma fonte, no site no ar.
+
+### Planning · 29/10/2026
+
+Feita por escrito, sem reunião. A Stela propôs, e a Geovana (PO) confirmou.
+
+| Issue | Feature | Prioridade | Responsável |
+|---|---|---|---|
+| #11 | RF01 · Criar conta | Must | Stela |
+| #12 | RF02 · Entrar e sair | Must | Stela |
+| #13 | RF03 · Ver minhas fontes | Must | Stela |
+| #14 | RF04 · Criar, renomear e excluir fonte | Must | Stela |
+
+- **Preparadas:** a #11 tem história, critérios de aceite e cenários de teste. A #12, a #13 e a #14 a Geovana prepara durante o sprint, cada uma antes de a Stela começar.
+- **Como conferir:** cada cenário vira um teste automático no PR; depois do merge, a Geovana testa os cenários no site e abre issue de bug se algo falhar.
+- **Dailies:** na issue "Scrum · Sprint 1" (#39).
+- **Em aberto:** confirmar com o professor o prazo da Entrega 2.
