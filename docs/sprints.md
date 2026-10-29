@@ -50,7 +50,6 @@ Feita por escrito, sem reunião.
 **Tentar** (o que mudar no Sprint 1)
 
 - Marcar o "Pronto quando" antes de fechar cada issue. (Stela)
-- No Sprint 1, a Geovana escrever os cenários de teste em cada issue antes de eu começar a programar, como o guia pede. (Stela)
 - Fazer a planning do Sprint 1 por escrito no docs/sprints.md, com a meta e as features escolhidas. (Stela)
 - No começo de cada sprint, a Stela me mandar o que vou fazer naquele sprint, para eu me preparar antes. (Geovana)
 - Escrever os cenários de teste de cada feature antes de a Stela começar a programar. (Geovana e Stela)
