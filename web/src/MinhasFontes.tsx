@@ -1,13 +1,16 @@
 import { Marca } from './Marca';
 
-/** T2 do protótipo, por enquanto só vazia. A lista de verdade chega na #13 e o botão Sair na #12. */
-export function MinhasFontes({ email }: { email: string }) {
+/** T2 do protótipo, por enquanto só vazia. A lista de verdade chega na #13. */
+export function MinhasFontes({ email, aoSair }: { email: string; aoSair: () => void }) {
   return (
     <>
       <header className="barra">
         <Marca />
         <div className="espaco" />
         <span className="quem">{email}</span>
+        <button type="button" className="botao botao-contorno botao-pequeno" onClick={aoSair}>
+          Sair
+        </button>
       </header>
 
       <main className="pagina">
