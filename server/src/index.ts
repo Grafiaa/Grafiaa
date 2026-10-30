@@ -3,6 +3,7 @@ import path from 'node:path';
 import { criarApp } from './app.js';
 import { criarPool } from './banco.js';
 import { repositorioDeContas } from './contas.js';
+import { repositorioDeFontes } from './fontes.js';
 import { aplicarMigracoes } from './migracoes.js';
 
 if (fs.existsSync('.env')) process.loadEnvFile('.env');
@@ -34,6 +35,7 @@ const app = criarApp({
   },
   pastaWeb: path.join(raiz, 'web/dist'),
   contas: pool && segredo ? { repositorio: repositorioDeContas(pool), segredo } : undefined,
+  fontes: pool ? repositorioDeFontes(pool) : undefined,
 });
 
 const porta = Number(process.env.PORT ?? 3000);

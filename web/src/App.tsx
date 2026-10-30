@@ -1,25 +1,36 @@
 import { useEffect, useState } from 'react';
 import { quemEntrou, sair } from './api';
 import { MinhasFontes } from './MinhasFontes';
+import { TelaDaFonte } from './TelaDaFonte';
 import { TelaEntrar } from './TelaEntrar';
 
-/** Quem entrou fica em /fontes; quem não entrou fica em /. Abrir /fontes sem ter entrado volta para /. */
-function ajustarEndereco(email: string | null, jeito: 'trocar' | 'avancar') {
-  const certo = email ? '/fontes' : '/';
-  if (location.pathname === certo) return;
-  if (jeito === 'avancar') history.pushState(null, '', certo);
-  else history.replaceState(null, '', certo);
+/**
+ * Quem não entrou fica em /. Quem entrou fica em /fontes ou em /fontes/:id;
+ * qualquer outro endereço leva para /fontes.
+ */
+function enderecoCerto(email: string | null, caminho: string) {
+  if (!email) return '/';
+  return /^\/fontes(\/[^/]+)?$/.test(caminho) ? caminho : '/fontes';
 }
 
 export function App() {
   // undefined: ainda perguntando ao servidor; null: ninguém entrou.
   const [email, setEmail] = useState<string | null | undefined>(undefined);
+  const [caminho, setCaminho] = useState(location.pathname);
+
+  function irPara(novo: string, jeito: 'trocar' | 'avancar') {
+    if (location.pathname !== novo) {
+      if (jeito === 'avancar') history.pushState(null, '', novo);
+      else history.replaceState(null, '', novo);
+    }
+    setCaminho(novo);
+  }
 
   useEffect(() => {
     // Ao abrir a página e ao apertar "voltar", pergunta de novo quem está entrado.
     const conferir = () =>
       quemEntrou().then((quem) => {
-        ajustarEndereco(quem, 'trocar');
+        irPara(enderecoCerto(quem, location.pathname), 'trocar');
         setEmail(quem);
       });
     conferir();
@@ -28,16 +39,24 @@ export function App() {
   }, []);
 
   function entrou(quem: string) {
-    ajustarEndereco(quem, 'avancar');
+    irPara('/fontes', 'avancar');
     setEmail(quem);
   }
 
   async function saiu() {
     await sair();
-    ajustarEndereco(null, 'avancar');
+    irPara('/', 'avancar');
     setEmail(null);
   }
 
   if (email === undefined) return null;
-  return email ? <MinhasFontes email={email} aoSair={saiu} /> : <TelaEntrar aoEntrar={entrou} />;
+  if (!email) return <TelaEntrar aoEntrar={entrou} />;
+
+  const idDaFonte = caminho.match(/^\/fontes\/([^/]+)$/)?.[1];
+  if (idDaFonte) {
+    return (
+      <TelaDaFonte id={idDaFonte} email={email} aoSair={saiu} aoVoltar={() => irPara('/fontes', 'avancar')} />
+    );
+  }
+  return <MinhasFontes email={email} aoSair={saiu} aoAbrir={(id) => irPara(`/fontes/${id}`, 'avancar')} />;
 }

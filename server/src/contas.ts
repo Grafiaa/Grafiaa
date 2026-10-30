@@ -46,8 +46,19 @@ export function emailValido(email: string): boolean {
   return email.length <= 254 && /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
 }
 
+/** Descobre, pelo cookie, quem fez o pedido. Devolve null se ninguém entrou ou se a sessão venceu. */
+export function criarLeitorDeUsuario(contas: RepositorioDeContas, segredo: string) {
+  return async (req: express.Request): Promise<Usuario | null> => {
+    const codigo = lerCookie(req.headers.cookie, NOME_DO_COOKIE);
+    return codigo ? contas.usuarioDaSessao(impressaoDoCodigo(codigo, segredo)) : null;
+  };
+}
+
+export type LeitorDeUsuario = ReturnType<typeof criarLeitorDeUsuario>;
+
 export function rotasDeContas(contas: RepositorioDeContas, segredo: string) {
   const rotas = express.Router();
+  const lerUsuario = criarLeitorDeUsuario(contas, segredo);
 
   // Senha embaralhada de mentira: quem tenta entrar com um e-mail sem conta espera o mesmo tempo
   // de quem erra a senha, e assim não dá para descobrir quais e-mails têm conta.
@@ -108,8 +119,7 @@ export function rotasDeContas(contas: RepositorioDeContas, segredo: string) {
   });
 
   rotas.get('/eu', async (req, res) => {
-    const codigo = lerCookie(req.headers.cookie, NOME_DO_COOKIE);
-    const usuario = codigo ? await contas.usuarioDaSessao(impressaoDoCodigo(codigo, segredo)) : null;
+    const usuario = await lerUsuario(req);
     if (!usuario) {
       res.status(401).json({ erro: MENSAGENS.naoEntrou });
       return;
