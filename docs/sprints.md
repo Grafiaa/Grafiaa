@@ -74,3 +74,38 @@ Feita por escrito, sem reunião. A Stela propôs, e a Geovana (PO) confirmou.
 - **Como conferir:** cada cenário vira um teste automático no PR; depois do merge, a Geovana testa os cenários no site e abre issue de bug se algo falhar.
 - **Dailies:** na issue "Scrum · Sprint 1" (#39).
 - **Em aberto:** confirmar com o professor o prazo da Entrega 2.
+
+### Review · 30/10/2026
+
+Feita por escrito, sem reunião.
+
+- **No ar:** https://grafiaa.onrender.com
+
+| Issue | Feature | Entregue em | Decisão |
+|---|---|---|---|
+| #11 | RF01 · Criar conta | PR #41 · 29/10 | Aceita |
+| #12 | RF02 · Entrar e sair | PR #42 · 29/10 | Aceita |
+| #13 | RF03 · Ver minhas fontes | PR #43 · 29/10 | Aceita |
+| #14 | RF04 · Criar, renomear e excluir fonte | PR #44 · 29/10 | Aceita |
+
+- **Meta do sprint ("Entrar e ver minhas fontes"):** atingida. As 4 features foram testadas no site, com todos os critérios de aceite marcados.
+- **Incremento:** Release v0.2.0 (criada pela Stela depois do merge desta ata).
+- **Depois deste sprint:** pela decisão D-10, o MVP da Entrega 2 é o que o Sprint 1 entrega. As outras 11 features ficam no Product Backlog.
+
+### Retrospectiva · 30/10/2026
+
+Feita por escrito, sem reunião.
+
+**Manter** (o que funcionou)
+
+- Cada cenário da issue virou um teste automático com o mesmo nome da tabela do PR, e a revisão ficou rápida de conferir. (Geovana e Stela)
+- Conferir clicando, no computador e no celular, antes de abrir o PR: o defeito do renomear (#14) apareceu ali, antes de chegar na revisão. (Geovana e Stela)
+
+**Parar** (o que atrapalhou)
+
+- Começar uma feature sem criar a branch antes: na #14 os commits foram para a main do computador, e foi preciso mover antes do envio. (Stela)
+- Entrar na planning com issues ainda sem critérios e cenários: a #12, a #13 e a #14 foram preparadas durante o sprint. (Geovana e Stela)
+
+**Tentar** (o que mudar numa próxima vez)
+
+- Preparar critérios e cenários de todas as issues do sprint antes da planning. (Geovana e Stela)
