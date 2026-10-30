@@ -1,38 +1,9 @@
 import request from 'supertest';
 import { describe, expect, it } from 'vitest';
 import { criarApp } from '../src/app.js';
-import { MENSAGENS, type RepositorioDeContas } from '../src/contas.js';
+import { MENSAGENS } from '../src/contas.js';
 import { conferirSenha } from '../src/senha.js';
-
-/** Banco de mentira, em memória, com o mesmo jeito do de verdade. */
-function contasDeMentira() {
-  const usuarios: { id: number; email: string; senhaHash: string }[] = [];
-  const sessoes: { usuarioId: number; impressao: string; expiraEm: Date }[] = [];
-  const repositorio: RepositorioDeContas = {
-    async criarUsuario(email, senhaHash) {
-      if (usuarios.some((u) => u.email === email)) return null;
-      const usuario = { id: usuarios.length + 1, email, senhaHash };
-      usuarios.push(usuario);
-      return { id: usuario.id, email };
-    },
-    async contaPorEmail(email) {
-      return usuarios.find((u) => u.email === email) ?? null;
-    },
-    async criarSessao(usuarioId, impressao, expiraEm) {
-      sessoes.push({ usuarioId, impressao, expiraEm });
-    },
-    async usuarioDaSessao(impressao) {
-      const sessao = sessoes.find((s) => s.impressao === impressao && s.expiraEm > new Date());
-      const usuario = sessao && usuarios.find((u) => u.id === sessao.usuarioId);
-      return usuario ? { id: usuario.id, email: usuario.email } : null;
-    },
-    async apagarSessao(impressao) {
-      const posicao = sessoes.findIndex((s) => s.impressao === impressao);
-      if (posicao !== -1) sessoes.splice(posicao, 1);
-    },
-  };
-  return { repositorio, usuarios, sessoes };
-}
+import { contasDeMentira } from './bancoDeMentira.js';
 
 function montar() {
   const banco = contasDeMentira();
