@@ -78,6 +78,40 @@ export async function abrirFonte(id: string): Promise<ResultadoDaFonte> {
   }
 }
 
+export type ResultadoDeFonteSalva = { ok: true; fonte: ResumoDeFonte } | { ok: false; erro: string; campo?: 'nome' };
+
+async function salvarFonte(caminho: string, metodo: 'POST' | 'PATCH', nome: string): Promise<ResultadoDeFonteSalva> {
+  try {
+    const resposta = await fetch(caminho, {
+      method: metodo,
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ nome }),
+    });
+    const corpo = (await resposta.json()) as ResumoDeFonte & { erro?: string; campo?: 'nome' };
+    if (resposta.ok) return { ok: true, fonte: corpo };
+    return { ok: false, erro: corpo.erro ?? SEM_SERVIDOR, campo: corpo.campo };
+  } catch {
+    return { ok: false, erro: SEM_SERVIDOR };
+  }
+}
+
+/** Cria uma fonte em branco, só com o glifo de espaço. */
+export function criarFonte(nome: string) {
+  return salvarFonte('/api/fontes', 'POST', nome);
+}
+
+export function renomearFonte(id: number, nome: string) {
+  return salvarFonte(`/api/fontes/${id}`, 'PATCH', nome);
+}
+
+export async function excluirFonte(id: number): Promise<boolean> {
+  try {
+    return (await fetch(`/api/fontes/${id}`, { method: 'DELETE' })).ok;
+  } catch {
+    return false;
+  }
+}
+
 /** Apaga a sessão no servidor. Mesmo que a rede falhe, a tela volta para Entrar. */
 export async function sair(): Promise<void> {
   try {
