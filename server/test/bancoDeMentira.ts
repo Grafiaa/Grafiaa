@@ -46,11 +46,28 @@ export function fontesDeMentira() {
       const fonte = fontes.find((f) => f.id === fonteId && f.usuarioId === usuarioId);
       return fonte ? semDono(fonte) : null;
     },
+    async criarFonteEmBranco(usuarioId, nome, limite) {
+      if (fontes.filter((f) => f.usuarioId === usuarioId).length >= limite) return null;
+      return semDono(criar(usuarioId, nome, { atualizadoEm: new Date().toISOString() }));
+    },
+    async renomearFonte(usuarioId, fonteId, nome) {
+      const fonte = fontes.find((f) => f.id === fonteId && f.usuarioId === usuarioId);
+      if (!fonte) return null;
+      fonte.nome = nome;
+      fonte.atualizadoEm = new Date().toISOString();
+      return semDono(fonte);
+    },
+    async excluirFonte(usuarioId, fonteId) {
+      const posicao = fontes.findIndex((f) => f.id === fonteId && f.usuarioId === usuarioId);
+      if (posicao === -1) return false;
+      fontes.splice(posicao, 1);
+      return true;
+    },
   };
   /** Põe uma fonte pronta na "mesa", como se já tivesse sido criada. */
   function criar(usuarioId: number, nome: string, extra: Partial<ResumoDeFonte> = {}) {
     const fonte = {
-      id: fontes.length + 1,
+      id: (fontes.at(-1)?.id ?? 0) + 1,
       usuarioId,
       nome,
       criadoEm: '2026-10-29T12:00:00.000Z',
@@ -62,5 +79,5 @@ export function fontesDeMentira() {
     fontes.push(fonte);
     return fonte;
   }
-  return { repositorio, criar };
+  return { repositorio, criar, fontes };
 }
