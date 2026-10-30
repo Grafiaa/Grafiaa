@@ -48,10 +48,12 @@ export function TelaDaFonte({
       <main className="pagina">
         {resultado?.tipo === 'achou' && (
           <div className="pagina-topo">
-            <h1>{resultado.fonte.nome}</h1>
-            <p className="meta">
-              {textoDosGlifos(resultado.fonte.glifos)} · {textoDaAlteracao(resultado.fonte.atualizadoEm)}
-            </p>
+            <div>
+              <h1>{resultado.fonte.nome}</h1>
+              <p className="meta">
+                {textoDosGlifos(resultado.fonte.glifos)} · {textoDaAlteracao(resultado.fonte.atualizadoEm)}
+              </p>
+            </div>
           </div>
         )}
 
