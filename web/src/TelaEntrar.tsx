@@ -1,5 +1,5 @@
 import { type FormEvent, useState } from 'react';
-import { criarConta } from './api';
+import { criarConta, entrar } from './api';
 import { Marca } from './Marca';
 
 type Aba = 'entrar' | 'criar';
@@ -7,7 +7,7 @@ type Erros = Partial<Record<'email' | 'senha', string>>;
 
 const EMAIL_VALIDO = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
-/** T1 do protótipo: abas Entrar e Criar conta. Por enquanto só Criar conta funciona (Entrar chega na #12). */
+/** T1 do protótipo: abas Entrar e Criar conta. */
 export function TelaEntrar({ aoEntrar }: { aoEntrar: (email: string) => void }) {
   const [aba, setAba] = useState<Aba>('entrar');
   const [email, setEmail] = useState('');
@@ -38,13 +38,8 @@ export function TelaEntrar({ aoEntrar }: { aoEntrar: (email: string) => void }) 
     setErros(encontrados);
     if (Object.keys(encontrados).length > 0) return;
 
-    if (!criando) {
-      setErroDoForm('Entrar chega na próxima versão. Por enquanto, crie uma conta.');
-      return;
-    }
-
     setEnviando(true);
-    const resultado = await criarConta(email, senha);
+    const resultado = criando ? await criarConta(email, senha) : await entrar(email, senha);
     setEnviando(false);
     if (resultado.ok) aoEntrar(resultado.email);
     else if (resultado.campo) setErros({ [resultado.campo]: resultado.erro });
@@ -125,7 +120,7 @@ export function TelaEntrar({ aoEntrar }: { aoEntrar: (email: string) => void }) 
           </div>
 
           <button className="botao botao-principal botao-grande" type="submit" disabled={enviando}>
-            {criando ? (enviando ? 'Criando conta…' : 'Criar conta') : 'Entrar'}
+            {criando ? (enviando ? 'Criando conta…' : 'Criar conta') : enviando ? 'Entrando…' : 'Entrar'}
           </button>
         </form>
       </section>
