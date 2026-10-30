@@ -15,6 +15,9 @@ function contasDeMentira() {
       usuarios.push(usuario);
       return { id: usuario.id, email };
     },
+    async contaPorEmail(email) {
+      return usuarios.find((u) => u.email === email) ?? null;
+    },
     async criarSessao(usuarioId, impressao, expiraEm) {
       sessoes.push({ usuarioId, impressao, expiraEm });
     },
@@ -22,6 +25,10 @@ function contasDeMentira() {
       const sessao = sessoes.find((s) => s.impressao === impressao && s.expiraEm > new Date());
       const usuario = sessao && usuarios.find((u) => u.id === sessao.usuarioId);
       return usuario ? { id: usuario.id, email: usuario.email } : null;
+    },
+    async apagarSessao(impressao) {
+      const posicao = sessoes.findIndex((s) => s.impressao === impressao);
+      if (posicao !== -1) sessoes.splice(posicao, 1);
     },
   };
   return { repositorio, usuarios, sessoes };
@@ -100,6 +107,67 @@ describe('criar conta (RF01)', () => {
 
     expect(resposta.status).toBe(400);
     expect(resposta.body).toEqual({ erro: 'Informe um e-mail válido.', campo: 'email' });
+  });
+});
+
+describe('entrar e sair (RF02)', () => {
+  async function montarComAna() {
+    const montado = montar();
+    await request(montado.app).post('/api/contas').send({ email: 'ana@exemplo.com', senha: 'letras123' });
+    return montado;
+  }
+
+  it('cenário 1: com o e-mail e a senha certos, entra e o /api/eu diz quem é', async () => {
+    const { app } = await montarComAna();
+    const resposta = await request(app).post('/api/sessoes').send({ email: 'ana@exemplo.com', senha: 'letras123' });
+
+    expect(resposta.status).toBe(200);
+    expect(resposta.body).toEqual({ email: 'ana@exemplo.com' });
+    const eu = await request(app).get('/api/eu').set('Cookie', cookieDaSessao(resposta).split(';')[0]);
+    expect(eu.body).toEqual({ email: 'ana@exemplo.com' });
+  });
+
+  it('cenário 2: senha errada responde 401 "E-mail ou senha incorretos."', async () => {
+    const { app } = await montarComAna();
+    const resposta = await request(app).post('/api/sessoes').send({ email: 'ana@exemplo.com', senha: 'errada123' });
+
+    expect(resposta.status).toBe(401);
+    expect(resposta.body).toEqual({ erro: 'E-mail ou senha incorretos.' });
+    expect(resposta.headers['set-cookie']).toBeUndefined();
+  });
+
+  it('cenário 4: e-mail sem conta responde exatamente o mesmo que a senha errada', async () => {
+    const { app } = await montarComAna();
+    const senhaErrada = await request(app).post('/api/sessoes').send({ email: 'ana@exemplo.com', senha: 'errada123' });
+    const semConta = await request(app).post('/api/sessoes').send({ email: 'bia@exemplo.com', senha: 'letras123' });
+
+    expect(semConta.status).toBe(senhaErrada.status);
+    expect(semConta.body).toEqual(senhaErrada.body);
+  });
+
+  it('cenário 3: sair apaga o cookie e o cookie antigo deixa de valer', async () => {
+    const { app } = await montarComAna();
+    const entrou = await request(app).post('/api/sessoes').send({ email: 'ana@exemplo.com', senha: 'letras123' });
+    const cookie = cookieDaSessao(entrou).split(';')[0];
+
+    const saiu = await request(app).delete('/api/sessoes').set('Cookie', cookie);
+    expect(saiu.status).toBe(204);
+    expect(cookieDaSessao(saiu)).toMatch(/^grafiaa_sessao=;.*Expires=Thu, 01 Jan 1970/);
+
+    const eu = await request(app).get('/api/eu').set('Cookie', cookie);
+    expect(eu.status).toBe(401);
+  });
+
+  it('entra com o e-mail em maiúsculas', async () => {
+    const { app } = await montarComAna();
+    const resposta = await request(app).post('/api/sessoes').send({ email: ' ANA@Exemplo.com ', senha: 'letras123' });
+    expect(resposta.status).toBe(200);
+  });
+
+  it('sair sem ter entrado responde 204 sem quebrar', async () => {
+    const { app } = montar();
+    const resposta = await request(app).delete('/api/sessoes');
+    expect(resposta.status).toBe(204);
   });
 });
 
