@@ -29,7 +29,7 @@ body {
 }
 
 body {
-  background: #ffd23f;
+  background: var(--sheet);
   background-image:
     radial-gradient(1100px 760px at 0% 0%, var(--warm), transparent 62%),
     radial-gradient(1000px 700px at 100% 100%, var(--cool), transparent 62%);
